@@ -7,7 +7,8 @@ module.exports = function(gulp) {
     if(!gulp)
         gulp = require('gulp');
 
-    $env.start(function (env, configs) {
-        require('./tasks/git')(gulp, $, $env, env, configs);
+    $env.start(function () {
+        require('./tasks/utilities')(gulp, $, $env);
+        require('./tasks/git')(gulp, $, $env);
     });
 };

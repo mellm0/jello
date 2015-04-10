@@ -1,20 +1,20 @@
-module.exports = function(gulp, $, $env, env, configs) {
+module.exports = function(gulp, $, $env) {
     var $fs = require("fs"),
-        $git = require("../lib/git")($env, env, configs),
+        $git = require("../lib/git")($env),
         $run = require('run-sequence'),
-        $helpers = require("../lib/helpers")($env, env, configs),
+        $helpers = require("../lib/helpers")($env),
         excludedDirectories = [
             'bower_components',
             'node_modules'
         ],
 
         checkIfCanDeployViaGit = function() {
-            return $git.is_available() && env.hasOwnProperty('deploy') && env.deploy.hasOwnProperty('git');
+            return $git.is_available() && $env.project().hasOwnProperty('deploy') && $env.project().deploy.hasOwnProperty('git');
         };
 
     gulp.task('git:pull', function(done) {
-        if($git.is_available() && env.hasOwnProperty('git')) {
-            var options = Array.isArray(env.git) ? $git.options(env.git[0]) : $git.options(env.git),
+        if($git.is_available() && $env.project().hasOwnProperty('git')) {
+            var options = Array.isArray($env.project().git) ? $git.options($env.project().git[0]) : $git.options($env.project().git),
                 filesWatched = {},
                 filesDone = 0,
                 ifDone = function () {
@@ -116,7 +116,7 @@ module.exports = function(gulp, $, $env, env, configs) {
                 // Fetch from remote for missing branches
                 $helpers.shell.exec('git fetch --all && git pull --all');
 
-                $helpers.apply_to_array_or_one(env.deploy.git, function (configuration, incrementUpdates, incrementFinished, ifDone, forceDone) {
+                $helpers.apply_to_array_or_one($env.project().deploy.git, function (configuration, incrementUpdates, incrementFinished, ifDone, forceDone) {
                     incrementUpdates();
 
                     var options = $git.options(configuration),
@@ -176,7 +176,7 @@ module.exports = function(gulp, $, $env, env, configs) {
                 });
             };
 
-            if(env.hasOwnProperty('git')) {
+            if($env.project().hasOwnProperty('git')) {
                 $git.commit_and_push_project(function () {
                     beginDeployment();
                 });
