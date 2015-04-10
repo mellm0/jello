@@ -9,6 +9,7 @@ module.exports = function(gulp) {
 
     $env.start(function () {
         require('./tasks/utilities')(gulp, $, $env);
+        require('./tasks/css')(gulp, $, $env);
         require('./tasks/git')(gulp, $, $env);
     });
 };

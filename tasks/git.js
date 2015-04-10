@@ -27,23 +27,23 @@ module.exports = function(gulp, $, $env) {
             // Change branch to master if head is bad
             if (options.branch === 'HEAD') {
                 $.util.beep();
-                $helpers.shell.exec('git checkout master');
+                $env.shell.exec('git checkout master');
                 options.branch = 'master';
             }
 
             if ($.util.env.reset) {
                 // Reset changes
                 console.log('Resetting changes');
-                $helpers.shell.exec('git reset --hard');
+                $env.shell.exec('git reset --hard');
             }
 
-            if ($helpers.shell.which('bower') && $helpers.shell.test('-f', $helpers.parent_directory('bower.json'))) {
+            if ($env.shell.which('bower') && $env.shell.test('-f', $helpers.parent_directory('bower.json'))) {
                 filesWatched[$helpers.parent_directory('bower.json')] = $fs.statSync($helpers.parent_directory('bower.json')).mtime;
 
                 $fs.watchFile($helpers.parent_directory('bower.json'), function () {
                     console.log('Installing bower packages');
 
-                    $helpers.shell.exec('bower install', function () {
+                    $env.shell.exec('bower install', function () {
                         filesDone++;
                         $fs.unwatchFile($helpers.parent_directory('bower.json'));
                         ifDone();
@@ -51,13 +51,13 @@ module.exports = function(gulp, $, $env) {
                 });
             }
 
-            if ($helpers.shell.which('npm') && $helpers.shell.test('-f', $helpers.parent_directory('package.json'))) {
+            if ($env.shell.which('npm') && $env.shell.test('-f', $helpers.parent_directory('package.json'))) {
                 filesWatched[$helpers.parent_directory('package.json')] = $fs.statSync($helpers.parent_directory('package.json')).mtime;
 
                 $fs.watchFile($helpers.parent_directory('package.json'), function () {
                     console.log('Installing node packages');
 
-                    $helpers.shell.exec('npm install', function () {
+                    $env.shell.exec('npm install', function () {
                         filesDone++;
                         $fs.unwatchFile($helpers.parent_directory('package.json'));
                         ifDone();
@@ -71,7 +71,7 @@ module.exports = function(gulp, $, $env) {
                 $fs.watchFile($helpers.parent_directory('composer.json'), function () {
                     console.log('Updating composer packages');
 
-                    $helpers.shell.exec('composer update', function () {
+                    $env.shell.exec('composer update', function () {
                         filesDone++;
                         $fs.unwatchFile($helpers.parent_directory('composer.json'));
                         ifDone();
@@ -79,7 +79,7 @@ module.exports = function(gulp, $, $env) {
                 });
             }
 
-            $helpers.shell.exec('git pull ' + options.origin + ' ' + options.branch, function () {
+            $env.shell.exec('git pull ' + options.origin + ' ' + options.branch, function () {
                 $helpers.notify('Downloaded from ' + options.origin + '/' + options.branch);
 
                 ifDone();
@@ -97,11 +97,11 @@ module.exports = function(gulp, $, $env) {
             done();
     });
 
-    gulp.task('git:push', function(done) {
+    gulp.task('git:push', ['start'], function(done) {
         $git.commit_and_push_project(done);
     });
 
-    gulp.task('git:status', function(done) {
+    gulp.task('git:status', ['start'], function(done) {
         $git.project_status(done);
     });
 
@@ -114,7 +114,7 @@ module.exports = function(gulp, $, $env) {
                 deployedTo = [],
                 beginDeployment = function() {
                 // Fetch from remote for missing branches
-                $helpers.shell.exec('git fetch --all && git pull --all');
+                    $env.shell.exec('git fetch --all && git pull --all');
 
                 $helpers.apply_to_array_or_one($env.project().deploy.git, function (configuration, incrementUpdates, incrementFinished, ifDone, forceDone) {
                     incrementUpdates();
@@ -125,13 +125,13 @@ module.exports = function(gulp, $, $env) {
                         commands = [];
 
                     // If branch exists, checkout normally, otherwise create new branch
-                    if (!$helpers.shell.exec('git branch --list ' + options.branch, {silent: true}).output.trim()) {
+                    if (!$env.shell.exec('git branch --list ' + options.branch, {silent: true}).output.trim()) {
                         commands.push('git checkout -B ' + options.origin + '/' + options.branch);
                         commands.push('git push ' + options.origin + ' ' + options.branch);
                     }
 
                     // Create from branch and pull from current branch and origin
-                    if (from && !$helpers.shell.exec('git branch --list ' + options.branch, {silent: true}).output.trim()) {
+                    if (from && !$env.shell.exec('git branch --list ' + options.branch, {silent: true}).output.trim()) {
                         commands.push('git checkout -B ' + fromOrigin + '/' + from);
                         commands.push('git pull ' + currentOrigin + ' ' + currentBranch);
                         commands.push('git push ' + fromOrigin + ' ' + from);
@@ -142,8 +142,8 @@ module.exports = function(gulp, $, $env) {
                     commands.push('git push ' + options.origin + ' ' + options.branch);
                     commands.push('git checkout -B ' + currentOrigin + '/' + currentBranch);
 
-                    $helpers.shell.exec(commands.join(' && '), function() {
-                        if ('HEAD' == $helpers.shell.exec('git rev-parse --abbrev-ref HEAD 2>/dev/null', {silent: true}).output.trim()) {
+                    $env.shell.exec(commands.join(' && '), function() {
+                        if ('HEAD' == $env.shell.exec('git rev-parse --abbrev-ref HEAD 2>/dev/null', {silent: true}).output.trim()) {
                             $helpers.notify(
                                 'There was an error pulling and merging from branch ' + from + ' which has detached your head! ' +
                                 'BAD! Please review using git/SourceTree, and resolve conflicts. ' +
@@ -193,7 +193,7 @@ module.exports = function(gulp, $, $env) {
         if (checkIfCanDeployViaGit()) {
             var accept = $.util.env.ours ? ' --ours' : ' --theirs';
 
-            $helpers.shell.exec('grep -lr \'<<<<<<<\' . --exclude-dir=' + excludedDirectories.join(' --exclude-dir=') + ' | xargs git checkout' + accept);
+            $env.shell.exec('grep -lr \'<<<<<<<\' . --exclude-dir=' + excludedDirectories.join(' --exclude-dir=') + ' | xargs git checkout' + accept);
 
             if($.util.env.deploy) {
                 $run('deploy', done());
