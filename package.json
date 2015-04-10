@@ -1,6 +1,5 @@
 {
   "name": "mwm-buildr",
-  "version": "0.1",
   "description": "Used for milkywaymultimedia.com.au projects - for managing assets, backups and deployment",
   "private": true,
   "main": "index.js",
