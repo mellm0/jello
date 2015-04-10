@@ -1,11 +1,11 @@
-var defaults = {
-        src: '_assets/js',
-        dest: 'public/js'
-    },
-    $delete = require('del');
-
 module.exports = function(gulp, $, $env) {
-    var $helpers = require("../lib/helpers")($env),
+    var defaults = {
+            src: [
+                '_assets/js'
+            ],
+            dest: 'public/js'
+        },
+        $helpers = require("../lib/helpers")($env),
         $transform = require("../lib/transformers")($, $env);
 
     // Delete CSS files (single, not merged)
@@ -17,7 +17,7 @@ module.exports = function(gulp, $, $env) {
                 var destDir = configuration.js.hasOwnProperty('dest') ? configuration.js.dest : defaults.dest,
                     src = configuration.js.hasOwnProperty('merged') ? [destDir + '/**/*'].concat($helpers.get_merged_files(configuration.js.merged, destDir, 'js', true)) : [destDir];
 
-                $delete(src, function () {
+                $env.delete(src, function () {
                     incrementFinished();
                     ifDone();
                 });
@@ -34,7 +34,7 @@ module.exports = function(gulp, $, $env) {
                 var destDir = configuration.js.hasOwnProperty('dest') ? configuration.js.dest : defaults.dest,
                     src = $helpers.get_merged_files(configuration.js.merged, destDir, 'js');
 
-                $delete(src, function () {
+                $env.delete(src, function () {
                     incrementFinished();
                     ifDone();
                 });
@@ -46,7 +46,7 @@ module.exports = function(gulp, $, $env) {
     gulp.task('js:single', ['start', 'js:clean'], function (done) {
         return $env.apply_to_all_and_stream(function (configuration, addToStream) {
             if (configuration.hasOwnProperty('js')) {
-                var src = configuration.js.hasOwnProperty('src') ? configuration.js.src : [defaults.src],
+                var src = configuration.js.hasOwnProperty('src') ? configuration.js.src : defaults.src,
                     dest = configuration.js.hasOwnProperty('dest') ? configuration.js.dest : defaults.dest;
 
                 addToStream(gulp.src(src)
@@ -66,7 +66,7 @@ module.exports = function(gulp, $, $env) {
 
                 for (var key in configuration.js.merged) {
                     if (configuration.js.merged.hasOwnProperty(key)) {
-                        var src = configuration.js.merged[key].hasOwnProperty('src') ? configuration.js.merged[key].src : [defaults.src + '/' + key],
+                        var src = configuration.js.merged[key].hasOwnProperty('src') ? configuration.js.merged[key].src : defaults.src[0] + '/' + key,
                             concatToFile = configuration.js.merged[key].hasOwnProperty('file') ? configuration.js.merged[key].file : key + '.js';
 
                         addToStream(gulp.src(src)
@@ -76,6 +76,23 @@ module.exports = function(gulp, $, $env) {
                         );
                     }
                 }
+            }
+        }, done);
+    });
+
+    // Lint JS files
+    gulp.task('js:lint', ['start'], function (done) {
+        return $env.apply_to_all_and_stream(function (configuration, addToStream) {
+            if (configuration.hasOwnProperty('js')) {
+                var src = configuration.js.hasOwnProperty('lint') ? configuration.js.lint : configuration.js.hasOwnProperty('src') ? configuration.js.src : defaults.src;
+
+                addToStream(gulp.src(src)
+                        .pipe($.plumber())
+                        .pipe($.cached('js'))
+                        .pipe($.jshint())
+                        .pipe($.remember('js'))
+                        .pipe($.jshint.reporter('default'))
+                );
             }
         }, done);
     });

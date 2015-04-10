@@ -1,11 +1,11 @@
-var defaults = {
-        src: '_assets/css',
-        dest: 'public/css'
-    },
-    $delete = require('del');
-
 module.exports = function(gulp, $, $env) {
-    var $helpers = require("../lib/helpers")($env),
+    var defaults = {
+            src: [
+                '_assets/css'
+            ],
+            dest: 'public/css'
+        },
+        $helpers = require("../lib/helpers")($env),
         $transform = require("../lib/transformers")($, $env);
 
     // Delete CSS files (single, not merged)
@@ -17,7 +17,7 @@ module.exports = function(gulp, $, $env) {
                 var destDir = configuration.css.hasOwnProperty('dest') ? configuration.css.dest : defaults.dest,
                     src = configuration.css.hasOwnProperty('merged') ? [destDir + '/**/*'].concat($helpers.get_merged_files(configuration.css.merged, destDir, 'css', true)) : [destDir];
 
-                $delete(src, function () {
+                $env.delete(src, function () {
                     incrementFinished();
                     ifDone();
                 });
@@ -34,7 +34,7 @@ module.exports = function(gulp, $, $env) {
                 var destDir = configuration.css.hasOwnProperty('dest') ? configuration.css.dest : defaults.dest,
                     src = $helpers.get_merged_files(configuration.css.merged, destDir, 'css');
 
-                $delete(src, function () {
+                $env.delete(src, function () {
                     incrementFinished();
                     ifDone();
                 });
@@ -46,7 +46,7 @@ module.exports = function(gulp, $, $env) {
     gulp.task('css:single', ['start', 'css:clean'], function (done) {
         return $env.apply_to_all_and_stream(function (configuration, addToStream) {
             if (configuration.hasOwnProperty('css')) {
-                var src = configuration.css.hasOwnProperty('src') ? configuration.css.src : [defaults.src],
+                var src = configuration.css.hasOwnProperty('src') ? configuration.css.src : defaults.src,
                     dest = configuration.css.hasOwnProperty('dest') ? configuration.css.dest : defaults.dest;
 
                 addToStream(gulp.src(src)
@@ -66,7 +66,7 @@ module.exports = function(gulp, $, $env) {
 
                 for (var key in configuration.css.merged) {
                     if (configuration.css.merged.hasOwnProperty(key)) {
-                        var src = configuration.css.merged[key].hasOwnProperty('src') ? configuration.css.merged[key].src : [defaults.src + '/' + key],
+                        var src = configuration.css.merged[key].hasOwnProperty('src') ? configuration.css.merged[key].src : [defaults.src[0] + '/' + key],
                             concatToFile = configuration.css.merged[key].hasOwnProperty('file') ? configuration.css.merged[key].file : key + '.css';
 
                         addToStream(gulp.src(src)
