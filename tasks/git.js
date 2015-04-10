@@ -1,7 +1,16 @@
 module.exports = function(gulp, $, $env, env, configs) {
     var $fs = require("fs"),
         $git = require("../lib/git")($env, env, configs),
-        $helpers = require("../lib/helpers")($env, env, configs);
+        $run = require('run-sequence'),
+        $helpers = require("../lib/helpers")($env, env, configs),
+        excludedDirectories = [
+            'bower_components',
+            'node_modules'
+        ],
+
+        checkIfCanDeployViaGit = function() {
+            return $git.is_available() && env.hasOwnProperty('deploy') && env.deploy.hasOwnProperty('git');
+        };
 
     gulp.task('git:pull', function(done) {
         if($git.is_available() && env.hasOwnProperty('git')) {
@@ -97,7 +106,7 @@ module.exports = function(gulp, $, $env, env, configs) {
     });
 
     gulp.task('git:deploy', function(done) {
-        if($git.is_available() && env.hasOwnProperty('deploy') && env.deploy.hasOwnProperty('git')) {
+        if(checkIfCanDeployViaGit()) {
             $helpers.notify('Please do not make any changes to files whilst the project is deploying...');
 
             var currentBranch = $git.current_branch(),
@@ -178,5 +187,26 @@ module.exports = function(gulp, $, $env, env, configs) {
         }
         else
             done();
+    });
+
+    gulp.task('git:deploy:fix', function (done) {
+        if (checkIfCanDeployViaGit()) {
+            var accept = $.util.env.ours ? ' --ours' : ' --theirs';
+
+            $helpers.shell.exec('grep -lr \'<<<<<<<\' . --exclude-dir=' + excludedDirectories.join(' --exclude-dir=') + ' | xargs git checkout' + accept);
+
+            if($.util.env.deploy) {
+                $run('deploy', done());
+            }
+            else if($.util.env.gitDeploy) {
+                $run('git:deploy', done());
+            }
+            else {
+                done();
+            }
+        }
+        else {
+            done();
+        }
     });
 };
