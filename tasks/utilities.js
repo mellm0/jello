@@ -1,5 +1,5 @@
 module.exports = function(gulp, $, $env) {
-    var $helpers = require("../lib/helpers")($env);
+    var $helpers = require("../lib/helpers")(gulp, $, $env);
 
     gulp.task('start', function (done) {
         $env.start(done);

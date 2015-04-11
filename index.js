@@ -1,9 +1,10 @@
 'use strict';
 
-var $env = require('./lib/env'),
-    $ = require('gulp-load-plugins')();
+var $ = require('gulp-load-plugins')();
 
 module.exports = function(gulp, tasks) {
+    var $env = require('./lib/env')(gulp, $);
+
     if(!gulp)
         gulp = require('gulp');
 
@@ -11,6 +12,8 @@ module.exports = function(gulp, tasks) {
         tasks = [
             './tasks/utilities',
             './tasks/server',
+            './tasks/build',
+            './tasks/watchers',
             './tasks/css',
             './tasks/js',
             './tasks/images',

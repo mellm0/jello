@@ -24,7 +24,7 @@ module.exports = function(gulp, $, $env) {
                 for (var i = 0; i < configuration.copy.length; i++) {
                     if(configuration.copy[i].hasOwnProperty('src') && configuration.copy[i].hasOwnProperty('dest')) {
                         addToStream(gulp.src(configuration.copy[i].src)
-                                .pipe(use.plumber())
+                                .pipe($.plumber())
                                 .pipe(gulp.dest(configuration.copy[i].dest))
                                 .pipe($env.server.reload({stream: true}))
                         );

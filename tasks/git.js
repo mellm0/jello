@@ -1,8 +1,7 @@
 module.exports = function(gulp, $, $env) {
     var $fs = require("fs"),
-        $git = require("../lib/git")($env),
-        $run = require('run-sequence'),
-        $helpers = require("../lib/helpers")($env),
+        $git = require("../lib/git")(gulp, $, $env),
+        $helpers = require("../lib/helpers")(gulp, $, $env),
         excludedDirectories = [
             'bower_components',
             'node_modules'
@@ -196,10 +195,10 @@ module.exports = function(gulp, $, $env) {
             $env.shell.exec('grep -lr \'<<<<<<<\' . --exclude-dir=' + excludedDirectories.join(' --exclude-dir=') + ' | xargs git checkout' + accept);
 
             if($.util.env.deploy) {
-                $run('deploy', done());
+                $helpers.sequence('deploy', done());
             }
             else if($.util.env.gitDeploy) {
-                $run('git:deploy', done());
+                $helpers.sequence('git:deploy', done());
             }
             else {
                 done();

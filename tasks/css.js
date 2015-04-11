@@ -5,7 +5,7 @@ module.exports = function(gulp, $, $env) {
             ],
             dest: 'public/css'
         },
-        $helpers = require("../lib/helpers")($env),
+        $helpers = require("../lib/helpers")(gulp, $, $env),
         $transform = require("../lib/transformers")($, $env);
 
     // Delete CSS files (single, not merged)

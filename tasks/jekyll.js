@@ -1,5 +1,5 @@
 module.exports = function(gulp, $, $env) {
-    var $helpers = require("../lib/helpers")($env),
+    var $helpers = require("../lib/helpers")(gulp, $, $env),
         jekyllIsAvailable = function() {
             return $env.shell.which('jekyll') && $env.shell.test('-f', '_config.yml');
         },
