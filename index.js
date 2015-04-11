@@ -21,13 +21,19 @@ module.exports = function(gulp, tasks) {
             './tasks/html',
             './tasks/jekyll',
             './tasks/copy',
+            './tasks/install',
+            './tasks/update',
             './tasks/git'
         ];
     }
 
-    $env.start(function () {
-        for(var i=0;i<tasks.length;i++) {
-            require(tasks[i])(gulp, $, $env);
-        }
-    });
+    //$env.start(function () {
+    //    for(var i=0;i<tasks.length;i++) {
+    //        require(tasks[i])(gulp, $, $env);
+    //    }
+    //});
+
+    for(var i=0;i<tasks.length;i++) {
+        require(tasks[i])(gulp, $, $env);
+    }
 };

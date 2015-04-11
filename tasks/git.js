@@ -32,7 +32,7 @@ module.exports = function(gulp, $, $env) {
 
             if ($.util.env.reset) {
                 // Reset changes
-                console.log('Resetting changes');
+                $.log('Resetting changes');
                 $env.shell.exec('git reset --hard');
             }
 
@@ -40,7 +40,7 @@ module.exports = function(gulp, $, $env) {
                 filesWatched[$helpers.parent_directory('bower.json')] = $fs.statSync($helpers.parent_directory('bower.json')).mtime;
 
                 $fs.watchFile($helpers.parent_directory('bower.json'), function () {
-                    console.log('Installing bower packages');
+                    $.log('Installing bower packages');
 
                     $env.shell.exec('bower install', function () {
                         filesDone++;
@@ -54,7 +54,7 @@ module.exports = function(gulp, $, $env) {
                 filesWatched[$helpers.parent_directory('package.json')] = $fs.statSync($helpers.parent_directory('package.json')).mtime;
 
                 $fs.watchFile($helpers.parent_directory('package.json'), function () {
-                    console.log('Installing node packages');
+                    $.log('Installing node packages');
 
                     $env.shell.exec('npm install', function () {
                         filesDone++;
@@ -68,7 +68,7 @@ module.exports = function(gulp, $, $env) {
                 filesWatched[$helpers.parent_directory('composer.json')] = $fs.statSync($helpers.parent_directory('composer.json')).mtime;
 
                 $fs.watchFile($helpers.parent_directory('composer.json'), function () {
-                    console.log('Updating composer packages');
+                    $.log('Updating composer packages');
 
                     $env.shell.exec('composer update', function () {
                         filesDone++;

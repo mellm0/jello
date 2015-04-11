@@ -28,91 +28,87 @@ module.exports = function(gulp, $, $env) {
         }
     }
 
-    gulp.task('watch', ['server'], function (done) {
+    // Disable sync when watching
+    if(process.argv.indexOf('watch') !== -1 || process.argv.indexOf('default') !== -1 || process.argv.length <= 2) {
+        $env.set('disable_sync', true);
+    }
+
+    gulp.task('watch', ['server', 'build'], function () {
         $env.set('disable_sync', false);
 
-        $helpers.sequence(
-            'build',
-            function() {
-                $env.set('disable_sync', false);
-            },
-            function() {
-                var watchers = {};
+        var watchers = {};
 
-                for (var file in watchFiles) {
-                    if (watchFiles.hasOwnProperty(file)) {
-                        if (file === 'assets.json') {
-                            watchers[file] = gulp.watch($env.configuration_files, ['watch:' + file]);
-                        }
-                        else {
-                            watchers[file] = gulp.watch(file, ['watch:' + file]);
-                        }
-                    }
+        for (var file in watchFiles) {
+            if (watchFiles.hasOwnProperty(file)) {
+                if (file === 'assets.json') {
+                    watchers[file] = gulp.watch($env.configuration_files, ['watch:' + file]);
                 }
+                else {
+                    watchers[file] = gulp.watch(file, ['watch:' + file]);
+                }
+            }
+        }
 
-                for (var task in watchTasks) {
-                    if (watchTasks.hasOwnProperty(task)) {
-                        var src = [];
+        for (var task in watchTasks) {
+            if (watchTasks.hasOwnProperty(task)) {
+                var src = [];
 
-                        configurations.forEach(function (configuration) {
-                            if (configuration.hasOwnProperty(task)) {
-                                if (Array.isArray(configuration[task])) {
-                                    configuration[task].forEach(function (minorTask) {
-                                        if (minorTask.hasOwnProperty('watch'))
-                                            src = src.concat(minorTask.watch);
-                                        else if (minorTask.hasOwnProperty('all'))
-                                            src = src.concat(minorTask.all);
-                                        else if (minorTask.hasOwnProperty('src'))
-                                            src = src.concat(minorTask.src);
-                                    });
+                configurations.forEach(function (configuration) {
+                    if (configuration.hasOwnProperty(task)) {
+                        if (Array.isArray(configuration[task])) {
+                            configuration[task].forEach(function (minorTask) {
+                                if (minorTask.hasOwnProperty('watch'))
+                                    src = src.concat(minorTask.watch);
+                                else if (minorTask.hasOwnProperty('all'))
+                                    src = src.concat(minorTask.all);
+                                else if (minorTask.hasOwnProperty('src'))
+                                    src = src.concat(minorTask.src);
+                            });
+                        }
+                        else if (configuration[task].hasOwnProperty('watch'))
+                            src = src.concat(configuration[task].watch);
+                        else if (configuration[task].hasOwnProperty('all'))
+                            src = src.concat(configuration[task].all);
+                        else if (configuration[task].hasOwnProperty('src'))
+                            src = src.concat(configuration[task].src);
+                    }
+                });
+
+                if (src.length)
+                    watchers[task] = gulp.watch(src, watchTasks[task]);
+            }
+        }
+
+        if ($env.project().hasOwnProperty('refresh')) {
+            watchers['refresh'] = gulp.watch($env.project(), ['server:reload']);
+        }
+
+        if (Object.keys(watchers).length) {
+            for (var key in watchers) {
+                if (watchers.hasOwnProperty(key)) {
+                    (
+                        function (name) {
+                            watchers[key].on('change', function (event) {
+                                $.util.beep();
+                                $.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
+
+                                if (event.type === 'deleted') {
+                                    if ($.cached.caches.hasOwnProperty(name) && $.cached.caches[name].hasOwnProperty(event.path)) {
+                                        delete $.cached.caches[name][event.path];
+                                        $.remember.forget(name, event.path);
+                                    }
+
+                                    if (name == 'js' && $.cached.caches.hasOwnProperty('js:lint') && $.cached.caches['js:lint'].hasOwnProperty(event.path)) {
+                                        delete $.cached.caches['js:lint'][event.path];
+                                        $.remember.forget('js:lint', event.path);
+                                    }
                                 }
-                                else if (configuration[task].hasOwnProperty('watch'))
-                                    src = src.concat(configuration[task].watch);
-                                else if (configuration[task].hasOwnProperty('all'))
-                                    src = src.concat(configuration[task].all);
-                                else if (configuration[task].hasOwnProperty('src'))
-                                    src = src.concat(configuration[task].src);
-                            }
-                        });
-
-                        if (src.length)
-                            watchers[task] = gulp.watch(src, watchTasks[task]);
-                    }
+                            });
+                        }(key)
+                    );
                 }
-
-                if ($env.project().hasOwnProperty('refresh')) {
-                    watchers['refresh'] = gulp.watch($env.project(), ['server:reload']);
-                }
-
-                if (Object.keys(watchers).length) {
-                    for (var key in watchers) {
-                        if (watchers.hasOwnProperty(key)) {
-                            (
-                                function (name) {
-                                    watchers[key].on('change', function (event) {
-                                        $.util.beep();
-                                        console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
-
-                                        if (event.type === 'deleted') {
-                                            if ($.cached.caches.hasOwnProperty(name) && $.cached.caches[name].hasOwnProperty(event.path)) {
-                                                delete $.cached.caches[name][event.path];
-                                                $.remember.forget(name, event.path);
-                                            }
-
-                                            if (name == 'js' && $.cached.caches.hasOwnProperty('js:lint') && $.cached.caches['js:lint'].hasOwnProperty(event.path)) {
-                                                delete $.cached.caches['js:lint'][event.path];
-                                                $.remember.forget('js:lint', event.path);
-                                            }
-                                        }
-                                    });
-                                }(key)
-                            );
-                        }
-                    }
-                }
-            },
-            done
-        );
+            }
+        }
     });
 
     // Default task is to watch assets
