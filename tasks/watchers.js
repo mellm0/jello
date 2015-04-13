@@ -15,25 +15,8 @@ module.exports = function(gulp, $, $env) {
             'sprites': ['build:sprites']
         };
 
-    for(var file in watchFiles) {
-        if(watchFiles.hasOwnProperty(file)) {
-            gulp.task('watch:' + file, watchFiles[file], function(done) {
-                $env.set('disable_sync', true);
-
-                var callback = function() {
-                    $env.set('disable_sync', false);
-                    $env.server.reload();
-                    done();
-                };
-
-                $helpers.sequence(
-                    'build',
-                    'jekyll',
-                    callback
-                );
-            });
-        }
-    }
+    // Default task is to watch assets
+    gulp.task('default', ['watch']);
 
     // Disable sync when watching
     if(process.argv.indexOf('watch') !== -1 || process.argv.indexOf('default') !== -1 || process.argv.length <= 2) {
@@ -120,6 +103,24 @@ module.exports = function(gulp, $, $env) {
         }
     });
 
-    // Default task is to watch assets
-    gulp.task('default', ['watch']);
+    // Set up watches for some JSON files
+    for(var file in watchFiles) {
+        if(watchFiles.hasOwnProperty(file)) {
+            gulp.task('watch:' + file, watchFiles[file], function(done) {
+                $env.set('disable_sync', true);
+
+                var callback = function() {
+                    $env.set('disable_sync', false);
+                    $env.server.reload();
+                    done();
+                };
+
+                $helpers.sequence(
+                    'build',
+                    'jekyll',
+                    callback
+                );
+            });
+        }
+    }
 };
