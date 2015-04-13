@@ -13,10 +13,11 @@ module.exports = function(gulp, tasks) {
 
     if(!tasks) {
         tasks = [
+            './tasks/watchers',
+            './tasks/deploy',
+            './tasks/build',
             './tasks/utilities',
             './tasks/server',
-            './tasks/build',
-            './tasks/watchers',
             './tasks/css',
             './tasks/js',
             './tasks/images',
@@ -27,8 +28,7 @@ module.exports = function(gulp, tasks) {
             './tasks/install',
             './tasks/update',
             './tasks/git',
-            './tasks/targets',
-            './tasks/deploy'
+            './tasks/targets'
         ];
     }
 
