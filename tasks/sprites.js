@@ -39,10 +39,10 @@ module.exports = function(gulp, $, $env) {
                                 .pipe($.plumber())
                                 .pipe($.svgSprite(config))
                                 .pipe(svgOnly)
-                                .pipe($.util.env.dev ? $.svgmin() : $.util.noop)
+                                .pipe($.util.env.dev ? $.util.noop() : $.svgmin())
                                 .pipe(svgOnly.restore())
                                 .pipe(gulp.dest(dest))
-                                .pipe($env.server.reload({stream: true}))
+                                //.pipe($env.server.reload({stream: true}))
                         );
                     }
                 }

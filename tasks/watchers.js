@@ -18,11 +18,18 @@ module.exports = function(gulp, $, $env) {
     for(var file in watchFiles) {
         if(watchFiles.hasOwnProperty(file)) {
             gulp.task('watch:' + file, watchFiles[file], function(done) {
+                $env.set('disable_sync', true);
+
+                var callback = function() {
+                    $env.set('disable_sync', false);
+                    $env.server.reload();
+                    done();
+                };
+
                 $helpers.sequence(
                     'build',
                     'jekyll',
-                    $env.server.reload,
-                    done
+                    callback
                 );
             });
         }
@@ -33,10 +40,12 @@ module.exports = function(gulp, $, $env) {
         $env.set('disable_sync', true);
     }
 
-    gulp.task('watch', ['server', 'build'], function () {
+    gulp.task('watch', ['start', 'server', 'build'], function () {
         $env.set('disable_sync', false);
+        $env.server.reload();
 
-        var watchers = {};
+        var watchers = {},
+            configurations = $env.start();
 
         for (var file in watchFiles) {
             if (watchFiles.hasOwnProperty(file)) {
@@ -80,7 +89,7 @@ module.exports = function(gulp, $, $env) {
         }
 
         if ($env.project().hasOwnProperty('refresh')) {
-            watchers['refresh'] = gulp.watch($env.project(), ['server:reload']);
+            watchers['refresh'] = gulp.watch($env.project().refresh, ['server:reload']);
         }
 
         if (Object.keys(watchers).length) {
@@ -90,7 +99,7 @@ module.exports = function(gulp, $, $env) {
                         function (name) {
                             watchers[key].on('change', function (event) {
                                 $.util.beep();
-                                $.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
+                                $.util.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
 
                                 if (event.type === 'deleted') {
                                     if ($.cached.caches.hasOwnProperty(name) && $.cached.caches[name].hasOwnProperty(event.path)) {

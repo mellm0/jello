@@ -26,7 +26,7 @@ module.exports = function(gulp, $, $env) {
                         addToStream(gulp.src(configuration.html[i].src)
                                 .pipe($.plumber())
                                 .pipe(gulp.dest(configuration.html[i].dest))
-                                .pipe($env.server.reload({stream: true}))
+                                //.pipe($env.server.reload({stream: true}))
                         );
                     }
                 }

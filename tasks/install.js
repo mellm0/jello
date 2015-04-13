@@ -18,7 +18,7 @@ module.exports = function(gulp, $, $env) {
                 if ($env.shell.test('-f', folder + 'bower.json')) {
                     incrementUpdates();
 
-                    $.log('Installing bower packages for folder: ' + folder);
+                    $.util.log('Installing bower packages for folder: ' + folder);
 
                     $env.shell.exec(command, function () {
                         installed.push(configuration.moduleFolder ? configuration.moduleFolder : '(project directory)');
@@ -42,7 +42,7 @@ module.exports = function(gulp, $, $env) {
     // Install node packages
     gulp.task('install:npm', function(done) {
         if($env.shell.which('npm') && $env.shell.test('-f', 'package.json')) {
-            $.log('Installing node packages');
+            $.util.log('Installing node packages');
             $env.shell.exec('npm install', function() {
                 $helpers.notify('Installed node packages');
                 done();
@@ -56,7 +56,7 @@ module.exports = function(gulp, $, $env) {
     // Install composer packages
     gulp.task('install:composer', function(done) {
         if($env.shell.which('composer') && $env.shell.test('-f', 'composer.json')) {
-            $.log('Installing composer packages');
+            $.util.log('Installing composer packages');
             $env.shell.exec('composer install', function() {
                 $helpers.notify('Installed composer packages');
                 done();

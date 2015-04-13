@@ -1,6 +1,9 @@
 'use strict';
 
-var $ = require('gulp-load-plugins')();
+var $path = require("path"),
+    $ = require('gulp-load-plugins')({
+        config: $path.join(__dirname, 'package.json')
+    });
 
 module.exports = function(gulp, tasks) {
     var $env = require('./lib/env')(gulp, $);

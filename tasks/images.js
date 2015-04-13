@@ -32,17 +32,17 @@ module.exports = function(gulp, $, $env) {
                     svgOnly = $.filter('**/*.svg');
 
                 addToStream(gulp.src(src)
-                        .pipe($.plumber())
+                        //.pipe($.plumber())
                         //.pipe(use.cached('images'))
                         .pipe(imagesOnly)
-                        .pipe($.util.env.dev ? $.imagemin() : $.util.noop)
+                        .pipe($.util.env.dev ? $.util.noop() : $.imagemin())
                         .pipe(imagesOnly.restore())
                         .pipe(svgOnly)
-                        .pipe($.util.env.dev ? $.svgmin() : $.util.noop)
+                        .pipe($.util.env.dev ? $.util.noop() : $.svgmin())
                         .pipe(svgOnly.restore())
                         //.pipe(use.remember('images'))
                         .pipe(gulp.dest(dest))
-                        .pipe($env.server.reload({stream: true}))
+                        //.pipe($env.server.reload({stream: true}))
                 );
             }
         }, done);

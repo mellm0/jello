@@ -3,7 +3,8 @@ module.exports = function(gulp, $, $env) {
             options: {
                 server: {
                     baseDir: 'public'
-                }
+                },
+                reloadDelay: 500
             }
         };
 

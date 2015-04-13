@@ -52,7 +52,7 @@ module.exports = function(gulp, $, $env) {
                 addToStream(gulp.src(src)
                         .pipe($transform.js()())
                         .pipe(gulp.dest(dest))
-                        .pipe($env.server.reload({stream: true}))
+                        //.pipe($env.server.reload({stream: true}))
                 );
             }
         }, done);
@@ -72,7 +72,7 @@ module.exports = function(gulp, $, $env) {
                         addToStream(gulp.src(src)
                                 .pipe($transform.js(concatToFile)())
                                 .pipe(gulp.dest(destDir))
-                                .pipe($env.server.reload({stream: true}))
+                                //.pipe($env.server.reload({stream: true}))
                         );
                     }
                 }

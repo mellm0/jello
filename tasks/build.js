@@ -18,10 +18,15 @@ module.exports = function(gulp, $, $env) {
         ],
 
         syncOrNot = function(done) {
+            var callback = function() {
+                $env.server.reload();
+                done();
+            };
+
             if($env.get('disable_sync'))
-                $helpers.sequence(server.reload, done);
+                $helpers.sequence(callback);
             else
-                $helpers.sequence('jekyll', server.reload, done);
+                $helpers.sequence('jekyll', callback);
         };
 
     for(var task in assetTasks) {
