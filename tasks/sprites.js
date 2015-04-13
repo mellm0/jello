@@ -32,15 +32,15 @@ module.exports = function(gulp, $, $env) {
                     if (configuration.sprites[i].hasOwnProperty('src')) {
                         var config = configuration.sprites[i].hasOwnProperty('config') ? configuration.sprites[i].config : {},
                             src = configuration.sprites[i].src ? configuration.sprites[i].src : defaults.src,
-                            dest = configuration.sprites[i].dest ? configuration.sprites[i].dest : defaults.dest,
-                            svgOnly = $.filter('**/*.svg');
+                            dest = configuration.sprites[i].dest ? configuration.sprites[i].dest : defaults.dest;
+                            //svgOnly = $.filter('**/*.svg');
 
                         addToStream(gulp.src(src)
                                 .pipe($.plumber())
                                 .pipe($.svgSprite(config))
-                                .pipe(svgOnly)
-                                .pipe($.util.env.dev ? $.util.noop() : $.svgmin())
-                                .pipe(svgOnly.restore())
+                                //.pipe(svgOnly)
+                                //.pipe($.util.env.dev ? $.util.noop() : $.svgmin())
+                                //.pipe(svgOnly.restore())
                                 .pipe(gulp.dest(dest))
                                 //.pipe($env.server.reload({stream: true}))
                         );
