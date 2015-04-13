@@ -15,7 +15,7 @@ module.exports = function(gulp, $, $env) {
             'build:images',
             'build:sprites',
             'build:copy'
-        ];
+        ],
 
         syncOrNot = function(done) {
             if($env.get('disable_sync'))

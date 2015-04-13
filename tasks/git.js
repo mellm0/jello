@@ -8,7 +8,7 @@ module.exports = function(gulp, $, $env) {
         ],
 
         checkIfCanDeployViaGit = function() {
-            return $git.is_available() && $env.project().hasOwnProperty('deploy') && $env.project().deploy.hasOwnProperty('git');
+            return $env.project().hasOwnProperty('deploy') && $env.project().deploy.hasOwnProperty('git') && $git.is_available_currently();
         };
 
     gulp.task('git:pull', function(done) {
@@ -64,7 +64,7 @@ module.exports = function(gulp, $, $env) {
                 });
             }
 
-            if (shell.which('composer') && shell.test('-f', $helpers.parent_directory('composer.json'))) {
+            if ($env.shell.which('composer') && shell.test('-f', $helpers.parent_directory('composer.json'))) {
                 filesWatched[$helpers.parent_directory('composer.json')] = $fs.statSync($helpers.parent_directory('composer.json')).mtime;
 
                 $fs.watchFile($helpers.parent_directory('composer.json'), function () {
@@ -124,13 +124,13 @@ module.exports = function(gulp, $, $env) {
                         commands = [];
 
                     // If branch exists, checkout normally, otherwise create new branch
-                    if (!$env.shell.exec('git branch --list ' + options.branch, {silent: true}).output.trim()) {
+                    if (!$env.shell_var('git branch --list ' + options.branch)) {
                         commands.push('git checkout -B ' + options.origin + '/' + options.branch);
                         commands.push('git push ' + options.origin + ' ' + options.branch);
                     }
 
                     // Create from branch and pull from current branch and origin
-                    if (from && !$env.shell.exec('git branch --list ' + options.branch, {silent: true}).output.trim()) {
+                    if (from && !$env.shell_var('git branch --list ' + options.branch)) {
                         commands.push('git checkout -B ' + fromOrigin + '/' + from);
                         commands.push('git pull ' + currentOrigin + ' ' + currentBranch);
                         commands.push('git push ' + fromOrigin + ' ' + from);
@@ -142,7 +142,7 @@ module.exports = function(gulp, $, $env) {
                     commands.push('git checkout -B ' + currentOrigin + '/' + currentBranch);
 
                     $env.shell.exec(commands.join(' && '), function() {
-                        if ('HEAD' == $env.shell.exec('git rev-parse --abbrev-ref HEAD 2>/dev/null', {silent: true}).output.trim()) {
+                        if ('HEAD' == $env.shell_var('git rev-parse --abbrev-ref HEAD 2>/dev/null')) {
                             $helpers.notify(
                                 'There was an error pulling and merging from branch ' + from + ' which has detached your head! ' +
                                 'BAD! Please review using git/SourceTree, and resolve conflicts. ' +

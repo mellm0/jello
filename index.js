@@ -23,7 +23,9 @@ module.exports = function(gulp, tasks) {
             './tasks/copy',
             './tasks/install',
             './tasks/update',
-            './tasks/git'
+            './tasks/git',
+            './tasks/targets',
+            './tasks/deploy'
         ];
     }
 
