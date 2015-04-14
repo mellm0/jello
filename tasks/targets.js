@@ -114,13 +114,15 @@ module.exports = function (gulp, $, $env) {
 
     gulp.task('targets:backup', ['start'], function (done) {
         if (isAvailable()) {
+            var type = $.util.env.type ? $.util.env.type : 'push';
+
             applyToOneOrAllTargets(function (configuration, incrementUpdates, incrementFinished, ifDone) {
                 incrementUpdates();
 
                 $remote.backup(configuration, function () {
                     incrementFinished();
                     ifDone();
-                }, 'push-backups', true, function(dest, src, options) {
+                }, type + '-backups', true, function(dest, src, options) {
                     $helpers.notify(src + ' has been backed up to: ' + dest);
                 });
             }, done, null, 'target');
