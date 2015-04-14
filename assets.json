@@ -1,0 +1,177 @@
+{
+  "server": {
+    "server": {
+      "baseDir": "public"
+    }
+  },
+  "deploy": {
+    "git": [
+      {
+        "branch": "master"
+      }
+    ],
+    "targets": [
+      {
+        "target": "production"
+      }
+    ]
+  },
+  "git": [
+    {
+      "branch": "develop"
+    }
+  ],
+  "targets": {
+    "production": [
+      {
+        "dest": "/home/mwm/milkywaymultimedia.com.au",
+        "host": "111.111.111.11",
+        "username": "mwm",
+        "src-commands-before": [
+          "composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction"
+        ],
+        "dest-commands-after": [
+          "cd {$PWD}",
+          "composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction",
+          "chmod +x framework/sake",
+          "bash {$PWD}/framework/sake dev/build 'flush=all'",
+          "bash {$PWD}/framework/sake dev/tasks/Milkyway-SS-Tasks-RefreshCache 'scrape_only=1'",
+          "find . -name _assets -type d -exec rm -rf {} \\;"
+        ],
+        "src-commands-after": [
+          "cd {$SRC}",
+          "composer install --dev --optimize-autoloader --no-interaction"
+        ],
+        "push-backups": [
+          {
+            "dest": "{$HOME}/push-backups/{$PROJECT}",
+            "itemize-changes": true
+          },
+          {
+            "dest": "{$HOME}/push-backups/archives/{$DATE}-{$PROJECT}",
+            "save-as-archive": true
+          }
+        ],
+        "pull-backups": [
+          {
+            "dest": "{$HOME}/pull-backups/{$PROJECT}",
+            "itemize-changes": true
+          }
+        ]
+      },
+      {
+        "dest": "/home/forge/milkywaymultimedia.com.au/assets",
+        "src": "{$PWD}/assets",
+        "host": "128.199.187.38",
+        "username": "forge",
+        "delete": false
+      }
+    ]
+  },
+  "css": {
+    "src": [
+      "_assets/css/**/*",
+      "!_assets/css/imports",
+      "!_assets/css/imports/**/*",
+      "!_assets/css/stylings/**/*",
+      "!_assets/css/stylings"
+    ],
+    "watch": [
+      "_assets/css/**/*"
+    ],
+    "dest": "app/css/",
+    "merged": {
+      "stylings": {
+        "src": [
+          "_assets/css/stylings/**/*"
+        ]
+      }
+    }
+  },
+  "js": {
+    "watch": [
+      "_assets/js/**/*.js"
+    ],
+    "lint": [
+      "_assets/js/**/*.js",
+      "!_assets/js/_plugins",
+      "!_assets/js/_plugins/**/*.js"
+    ],
+    "src": [
+      "_assets/js/**/*.js",
+      "!_assets/js/_*",
+      "!_assets/js/_*/**/*",
+      "!_assets/js/modules/**/*.js",
+      "!_assets/js/initial/**/*.js"
+    ],
+    "dest": "app/js/",
+    "merged": {
+      "modules": {
+        "src": [
+          "bower_components/jquery/dist/jquery.js",
+          "bower_components/bootstrap/dist/js/bootstrap.js",
+          "bower_components/waitForImages/dist/jquery.waitforimages.min.js",
+          "bower_components/vivus/dist/vivus.js",
+          "bower_components/fotorama/fotorama.js",
+          "bower_components/parsleyjs/dist/parsley.remote.js",
+          "bower_components/assets/javascript/*.js",
+          "_assets/js/modules/**/*.js"
+        ]
+      },
+      "initial": {
+        "src": [
+          "bower_components/html5-boilerplate/js/vendor/modernizr-2.6.2.min.js",
+          "bower_components/assets/javascript/parsley/*.js",
+          "_assets/js/initial/**/*.js"
+        ]
+      }
+    }
+  },
+  "images": {
+    "src": [
+      "_assets/images/**/*",
+      "!_assets/images/_*",
+      "!_assets/images/_*/**/*",
+      "bower_components/fotorama/fotorama.png",
+      "bower_components/fotorama/fotorama@2x.png"
+    ],
+    "dest": "app/images/"
+  },
+  "copy": [
+    {
+      "src": [
+        "bower_components/open-iconic/sprite/sprite.min.svg",
+        "bower_components/open-iconic/font/fonts/**/*",
+        "bower_components/font-awesome/fonts/**/*",
+        "_assets/fonts/**/*",
+        "!_assets/fonts/_*",
+        "!_assets/fonts/_*/**/*"
+      ],
+      "dest": "app/fonts/"
+    }
+  ],
+  "sprites": [
+    {
+      "src": [
+        "bower_components/open-iconic/svg/**/*.svg",
+        "_assets/images/icons/**/*.svg"
+      ],
+      "dest": "app/icons/",
+      "config": {
+        "mode": {
+          "css": {
+            "prefix": ".mwm-icon-%s",
+            "sprite": "mwm-icons.svg"
+          },
+          "symbol": {
+            "prefix": ".mwm-icon-%s",
+            "sprite": "mwm-icons.svg"
+          }
+        }
+      }
+    }
+  ],
+  "refresh": [
+    "**/*.md"
+  ]
+}
