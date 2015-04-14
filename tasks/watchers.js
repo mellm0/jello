@@ -51,16 +51,12 @@ module.exports = function(gulp, $, $env) {
                             configuration[task].forEach(function (minorTask) {
                                 if (minorTask.hasOwnProperty('watch'))
                                     src = src.concat(minorTask.watch);
-                                else if (minorTask.hasOwnProperty('all'))
-                                    src = src.concat(minorTask.all);
                                 else if (minorTask.hasOwnProperty('src'))
                                     src = src.concat(minorTask.src);
                             });
                         }
                         else if (configuration[task].hasOwnProperty('watch'))
                             src = src.concat(configuration[task].watch);
-                        else if (configuration[task].hasOwnProperty('all'))
-                            src = src.concat(configuration[task].all);
                         else if (configuration[task].hasOwnProperty('src'))
                             src = src.concat(configuration[task].src);
                     }
