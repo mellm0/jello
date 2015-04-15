@@ -26,10 +26,10 @@ module.exports = function (gulp, $, $env) {
             if(!configurationToCheck)
                 configurationToCheck = $env.project().targets;
 
-            var target = use.util.env[envProperty];
+            var target = $.util.env.hasOwnProperty(envProperty) ? $.util.env[envProperty] : null, $target;
 
             if (target) {
-                var $target = $remote.find_target(target);
+                $target = $remote.find_target(target);
 
                 if ($target === false) {
                     $helpers.notify('There are no settings for the target: ' + target);
@@ -39,16 +39,21 @@ module.exports = function (gulp, $, $env) {
 
                 $helpers.notify('Uploading to target: ' + target);
 
-                $helpers.apply_to_array_or_one($target, onProcess, onFinished);
+                $helpers.apply_to_array_or_one($target, onProcess, onFinished, true);
             }
             else {
-                $helpers.notify('Uploading to all targets: ' + target);
+                $helpers.notify('Uploading to all targets');
 
                 for (target in configurationToCheck) {
                     if (configurationToCheck.hasOwnProperty(target)) {
                         $helpers.notify('Executing target: ' + target);
 
-                        $helpers.apply_to_array_or_one($env.project().targets[target], onProcess, onFinished);
+                        if(configurationToCheck[target].hasOwnProperty('target'))
+                            $target = $remote.find_target(configurationToCheck[target].target);
+                        else
+                            $target = configurationToCheck[target];
+
+                        $helpers.apply_to_array_or_one($target, onProcess, onFinished, true);
                     }
                 }
             }
@@ -88,7 +93,7 @@ module.exports = function (gulp, $, $env) {
                     incrementFinished();
                     ifDone();
                 }, 'pull-backups', true);
-            }, done);
+            }, done, true);
         }
         else {
             done();
