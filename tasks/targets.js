@@ -33,7 +33,7 @@ module.exports = function (gulp, $, $env) {
 
                 if ($target === false) {
                     $helpers.notify('There are no settings for the target: ' + target);
-                    done();
+                    onFinished();
                     return;
                 }
 
@@ -45,7 +45,7 @@ module.exports = function (gulp, $, $env) {
                 $helpers.notify('Uploading to all targets');
 
                 for (target in configurationToCheck) {
-                    if (configurationToCheck.hasOwnProperty(target)) {
+                    if (configurationToCheck.hasOwnProperty(target) && ($.util.env.all || !configurationToCheck[target].hasOwnProperty('manual') || !configurationToCheck[target].manual)) {
                         $helpers.notify('Executing target: ' + target);
 
                         if(configurationToCheck[target].hasOwnProperty('target'))
