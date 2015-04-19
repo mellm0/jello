@@ -1,18 +1,21 @@
-module.exports = function(gulp, $, $env) {
+module.exports = function (gulp, $, $env) {
     var $helpers = require("../lib/helpers")(gulp, $, $env),
-        jekyllIsAvailable = function() {
+        jekyllIsAvailable = function () {
             return $env.shell.which('jekyll') && $env.shell.test('-f', '_config.yml');
         },
-        args = function(args) {
-            if(!args)
+        args = function (args) {
+            if (!args) {
                 args = [];
+            }
 
             if ($env.project().hasOwnProperty('jekyll')) {
-                if ($env.project().hasOwnProperty('src'))
+                if ($env.project().hasOwnProperty('src')) {
                     args.push('--source ' + $env.project().jekyll.src);
+                }
 
-                if ($env.project().jekyll.hasOwnProperty('dest'))
+                if ($env.project().jekyll.hasOwnProperty('dest')) {
                     args.push('--destination ' + $env.project().jekyll.dest);
+                }
             }
 
             return args.join(' ');
@@ -26,8 +29,9 @@ module.exports = function(gulp, $, $env) {
                 done();
             });
         }
-        else
+        else {
             done();
+        }
     });
 
     // Serve jekyll (this only builds once, better to use watch)
@@ -39,7 +43,8 @@ module.exports = function(gulp, $, $env) {
                 done();
             });
         }
-        else
+        else {
             done();
+        }
     });
 };

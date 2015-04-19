@@ -1,10 +1,10 @@
-module.exports = function(gulp, $, $env) {
+module.exports = function (gulp, $, $env) {
     var defaults = {
-            src: [
-                '_assets/images'
-            ],
-            dest: 'public/images'
-        };
+        src:  [
+            '_assets/images'
+        ],
+        dest: 'public/images'
+    };
 
     // Delete Images
     gulp.task('images:clean', ['start'], function (done) {
@@ -28,10 +28,11 @@ module.exports = function(gulp, $, $env) {
             if (configuration.hasOwnProperty('images')) {
                 var src = configuration.images.hasOwnProperty('src') ? configuration.images.src : defaults.src,
                     dest = configuration.images.hasOwnProperty('dest') ? configuration.images.dest : defaults.dest,
-                    imagesOnly = $.filter(['**/*.jpg','**/*.gif','**/*.png']),
+                    imagesOnly = $.filter(['**/*.jpg', '**/*.gif', '**/*.png']),
                     svgOnly = $.filter('**/*.svg');
 
-                addToStream(gulp.src(src)
+                addToStream(
+                    gulp.src(src)
                         //.pipe($.plumber())
                         //.pipe(use.cached('images'))
                         .pipe(imagesOnly)
@@ -42,7 +43,7 @@ module.exports = function(gulp, $, $env) {
                         .pipe(svgOnly.restore())
                         //.pipe(use.remember('images'))
                         .pipe(gulp.dest(dest))
-                        //.pipe($env.server.reload({stream: true}))
+                    //.pipe($env.server.reload({stream: true}))
                 );
             }
         }, done);

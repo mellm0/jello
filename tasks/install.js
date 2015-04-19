@@ -1,4 +1,4 @@
-module.exports = function(gulp, $, $env) {
+module.exports = function (gulp, $, $env) {
     var $helpers = require("../lib/helpers")(gulp, $, $env),
         allTasks = [
             'install:bower',
@@ -7,8 +7,8 @@ module.exports = function(gulp, $, $env) {
         ];
 
     // Install bower packages
-    gulp.task('install:bower', function(done) {
-        if($env.shell.which('bower')) {
+    gulp.task('install:bower', function (done) {
+        if ($env.shell.which('bower')) {
             var installed = [];
 
             $env.apply_to_all(function (configuration, incrementUpdates, incrementFinished, ifDone) {
@@ -26,8 +26,8 @@ module.exports = function(gulp, $, $env) {
                         ifDone();
                     });
                 }
-            }, function() {
-                if(installed.length) {
+            }, function () {
+                if (installed.length) {
                     $helpers.notify('Installed bower packages for: ' + installed.join(', '));
                 }
 
@@ -40,10 +40,10 @@ module.exports = function(gulp, $, $env) {
     });
 
     // Install node packages
-    gulp.task('install:npm', function(done) {
-        if($env.shell.which('npm') && $env.shell.test('-f', 'package.json')) {
+    gulp.task('install:npm', function (done) {
+        if ($env.shell.which('npm') && $env.shell.test('-f', 'package.json')) {
             $.util.log('Installing node packages');
-            $env.shell.exec('npm install', function() {
+            $env.shell.exec('npm install', function () {
                 $helpers.notify('Installed node packages');
                 done();
             });
@@ -54,10 +54,10 @@ module.exports = function(gulp, $, $env) {
     });
 
     // Install composer packages
-    gulp.task('install:composer', function(done) {
-        if($env.shell.which('composer') && $env.shell.test('-f', 'composer.json')) {
+    gulp.task('install:composer', function (done) {
+        if ($env.shell.which('composer') && $env.shell.test('-f', 'composer.json')) {
             $.util.log('Installing composer packages');
-            $env.shell.exec('composer install', function() {
+            $env.shell.exec('composer install', function () {
                 $helpers.notify('Installed composer packages');
                 done();
             });

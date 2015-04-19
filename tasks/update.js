@@ -1,4 +1,4 @@
-module.exports = function(gulp, $, $env) {
+module.exports = function (gulp, $, $env) {
     var $helpers = require("../lib/helpers")(gulp, $, $env),
         allTasks = [
             'update:bower',
@@ -7,8 +7,8 @@ module.exports = function(gulp, $, $env) {
         ];
 
     // Update bower packages
-    gulp.task('update:bower', function(done) {
-        if($env.shell.which('bower')) {
+    gulp.task('update:bower', function (done) {
+        if ($env.shell.which('bower')) {
             var installed = [];
 
             $env.apply_to_all(function (configuration, incrementUpdates, incrementFinished, ifDone) {
@@ -26,8 +26,8 @@ module.exports = function(gulp, $, $env) {
                         ifDone();
                     });
                 }
-            }, function() {
-                if(installed.length) {
+            }, function () {
+                if (installed.length) {
                     $helpers.notify('Updated bower packages for: ' + installed.join(', '));
                 }
 
@@ -40,10 +40,10 @@ module.exports = function(gulp, $, $env) {
     });
 
     // Update node packages
-    gulp.task('update:npm', function(done) {
-        if($env.shell.which('npm') && $env.shell.test('-f', 'package.json')) {
+    gulp.task('update:npm', function (done) {
+        if ($env.shell.which('npm') && $env.shell.test('-f', 'package.json')) {
             $.util.log('Updating node packages');
-            $env.shell.exec('npm update', function() {
+            $env.shell.exec('npm update', function () {
                 $helpers.notify('Updated node packages');
                 done();
             });
@@ -54,10 +54,10 @@ module.exports = function(gulp, $, $env) {
     });
 
     // Update composer packages
-    gulp.task('update:composer', function(done) {
-        if($env.shell.which('composer') && $env.shell.test('-f', 'composer.json')) {
+    gulp.task('update:composer', function (done) {
+        if ($env.shell.which('composer') && $env.shell.test('-f', 'composer.json')) {
             $.util.log('Updating composer packages');
-            $env.shell.exec('composer update', function() {
+            $env.shell.exec('composer update', function () {
                 $helpers.notify('Updated composer packages');
                 done();
             });

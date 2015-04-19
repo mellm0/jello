@@ -12,19 +12,22 @@ module.exports = function (gulp, $, $env) {
 
         getDefaultTarget = function () {
             for (var first in $env.project().targets) {
-                if ($env.project().targets.hasOwnProperty(first))
+                if ($env.project().targets.hasOwnProperty(first)) {
                     return first;
+                }
             }
 
             return {};
         },
 
         applyToOneOrAllTargets = function (onProcess, onFinished, configurationToCheck, envProperty) {
-            if (!envProperty)
+            if (!envProperty) {
                 envProperty = 'to';
+            }
 
-            if(!configurationToCheck)
+            if (!configurationToCheck) {
                 configurationToCheck = $env.project().targets;
+            }
 
             var target = $.util.env.hasOwnProperty(envProperty) ? $.util.env[envProperty] : null, $target;
 
@@ -48,10 +51,12 @@ module.exports = function (gulp, $, $env) {
                     if (configurationToCheck.hasOwnProperty(target) && ($.util.env.all || !configurationToCheck[target].hasOwnProperty('manual') || !configurationToCheck[target].manual)) {
                         $helpers.notify('Executing target: ' + target);
 
-                        if(configurationToCheck[target].hasOwnProperty('target'))
+                        if (configurationToCheck[target].hasOwnProperty('target')) {
                             $target = $remote.find_target(configurationToCheck[target].target);
-                        else
+                        }
+                        else {
                             $target = configurationToCheck[target];
+                        }
 
                         $helpers.apply_to_array_or_one($target, onProcess, onFinished, true);
                     }
@@ -127,7 +132,7 @@ module.exports = function (gulp, $, $env) {
                 $remote.backup(configuration, function () {
                     incrementFinished();
                     ifDone();
-                }, type + '-backups', true, function(dest, src, options) {
+                }, type + '-backups', true, function (dest, src, options) {
                     $helpers.notify(src + ' has been backed up to: ' + dest);
                 });
             }, done, null, 'target');

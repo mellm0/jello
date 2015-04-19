@@ -1,4 +1,4 @@
-module.exports = function(gulp, $, $env) {
+module.exports = function (gulp, $, $env) {
     var $helpers = require("../lib/helpers")(gulp, $, $env),
         deployTasks = [
             'git:deploy',
@@ -6,7 +6,7 @@ module.exports = function(gulp, $, $env) {
         ];
 
     // Execute all deploy tasks (it does it in sequence, so you can solve issues one at a time)
-    gulp.task('deploy', function(done) {
+    gulp.task('deploy', function (done) {
         $helpers.sequence.apply(this, ['build'].concat(deployTasks).concat([done]));
     });
 };

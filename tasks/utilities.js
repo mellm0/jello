@@ -1,14 +1,14 @@
-module.exports = function(gulp, $, $env) {
+module.exports = function (gulp, $, $env) {
     var $helpers = require("../lib/helpers")(gulp, $, $env);
 
     gulp.task('start', function (done) {
-        $env.start(function() {
+        $env.start(function () {
             done();
         });
     });
 
     gulp.task('reconfigure', function (done) {
-        $env.refresh(function() {
+        $env.refresh(function () {
             done();
         });
     });

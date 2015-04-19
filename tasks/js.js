@@ -1,6 +1,6 @@
-module.exports = function(gulp, $, $env) {
+module.exports = function (gulp, $, $env) {
     var defaults = {
-            src: [
+            src:  [
                 '_assets/js'
             ],
             dest: 'public/js'
@@ -49,10 +49,11 @@ module.exports = function(gulp, $, $env) {
                 var src = configuration.js.hasOwnProperty('src') ? configuration.js.src : defaults.src,
                     dest = configuration.js.hasOwnProperty('dest') ? configuration.js.dest : defaults.dest;
 
-                addToStream(gulp.src(src)
+                addToStream(
+                    gulp.src(src)
                         .pipe($transform.js()())
                         .pipe(gulp.dest(dest))
-                        //.pipe($env.server.reload({stream: true}))
+                    //.pipe($env.server.reload({stream: true}))
                 );
             }
         }, done);
@@ -69,10 +70,11 @@ module.exports = function(gulp, $, $env) {
                         var src = configuration.js.merged[key].hasOwnProperty('src') ? configuration.js.merged[key].src : defaults.src[0] + '/' + key,
                             concatToFile = configuration.js.merged[key].hasOwnProperty('file') ? configuration.js.merged[key].file : key + '.js';
 
-                        addToStream(gulp.src(src)
+                        addToStream(
+                            gulp.src(src)
                                 .pipe($transform.js(concatToFile)())
                                 .pipe(gulp.dest(destDir))
-                                //.pipe($env.server.reload({stream: true}))
+                            //.pipe($env.server.reload({stream: true}))
                         );
                     }
                 }
@@ -86,7 +88,8 @@ module.exports = function(gulp, $, $env) {
             if (configuration.hasOwnProperty('js')) {
                 var src = configuration.js.hasOwnProperty('lint') ? configuration.js.lint : configuration.js.hasOwnProperty('src') ? configuration.js.src : defaults.src;
 
-                addToStream(gulp.src(src)
+                addToStream(
+                    gulp.src(src)
                         .pipe($.plumber())
                         .pipe($.cached('js'))
                         .pipe($.jshint())

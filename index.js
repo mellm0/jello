@@ -5,13 +5,14 @@ var $path = require("path"),
         config: $path.join(__dirname, 'package.json')
     });
 
-module.exports = function(gulp, tasks) {
+module.exports = function (gulp, tasks) {
     var $env = require('./lib/env')(gulp, $);
 
-    if(!gulp)
+    if (!gulp) {
         gulp = require('gulp');
+    }
 
-    if(!tasks) {
+    if (!tasks) {
         tasks = [
             './tasks/watchers',
             './tasks/deploy',
@@ -38,7 +39,7 @@ module.exports = function(gulp, tasks) {
     //    }
     //});
 
-    for(var i=0;i<tasks.length;i++) {
+    for (var i = 0; i < tasks.length; i++) {
         require(tasks[i])(gulp, $, $env);
     }
 };

@@ -1,10 +1,10 @@
-module.exports = function(gulp, $, $env) {
+module.exports = function (gulp, $, $env) {
     // Clean copied files
     gulp.task('copy:clean', ['start'], function (done) {
         $env.apply_to_all(function (configuration, incrementUpdates, incrementFinished, ifDone) {
             if (configuration.hasOwnProperty('copy')) {
                 for (var i = 0; i < configuration.copy.length; i++) {
-                    if(configuration.copy[i].hasOwnProperty('dest')) {
+                    if (configuration.copy[i].hasOwnProperty('dest')) {
                         incrementUpdates();
 
                         $env.delete(configuration.copy[i].dest, function () {
@@ -22,11 +22,12 @@ module.exports = function(gulp, $, $env) {
         return $env.apply_to_all_and_stream(function (configuration, addToStream) {
             if (configuration.hasOwnProperty('copy')) {
                 for (var i = 0; i < configuration.copy.length; i++) {
-                    if(configuration.copy[i].hasOwnProperty('src') && configuration.copy[i].hasOwnProperty('dest')) {
-                        addToStream(gulp.src(configuration.copy[i].src)
+                    if (configuration.copy[i].hasOwnProperty('src') && configuration.copy[i].hasOwnProperty('dest')) {
+                        addToStream(
+                            gulp.src(configuration.copy[i].src)
                                 .pipe($.plumber())
                                 .pipe(gulp.dest(configuration.copy[i].dest))
-                                //.pipe($env.server.reload({stream: true}))
+                            //.pipe($env.server.reload({stream: true}))
                         );
                     }
                 }

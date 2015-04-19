@@ -1,12 +1,12 @@
-module.exports = function(gulp, $, $env) {
+module.exports = function (gulp, $, $env) {
     var defaults = {
-            options: {
-                server: {
-                    baseDir: 'public'
-                },
-                reloadDelay: 500
-            }
-        };
+        options: {
+            server:      {
+                baseDir: 'public'
+            },
+            reloadDelay: 500
+        }
+    };
 
     // Start a browser sync server
     gulp.task('server', ['jekyll'], function (done) {

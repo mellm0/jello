@@ -2,7 +2,7 @@
  * Milkyway Multimedia
  * Automatic asset handling
  *
- * @package milkyway-multimedia/assets
+ * @package milkyway-multimedia/mwm-buildr
  * @author Mellisa Hankins <mell@milkywaymultimedia.com.au>
  */
 

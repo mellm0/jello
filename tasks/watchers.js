@@ -1,10 +1,10 @@
-module.exports = function(gulp, $, $env) {
+module.exports = function (gulp, $, $env) {
     var $helpers = require("../lib/helpers")(gulp, $, $env),
         watchFiles = {
-            'assets.json': ['reconfigure'],
-            'bower.json':  ['install:bower'],
-            'composer.json':  ['update:composer'],
-            'package.json':    ['install:npm']
+            'assets.json':   ['reconfigure'],
+            'bower.json':    ['install:bower'],
+            'composer.json': ['update:composer'],
+            'package.json':  ['install:npm']
         },
         watchTasks = {
             'css':     ['build:css'],
@@ -19,7 +19,7 @@ module.exports = function(gulp, $, $env) {
     gulp.task('default', ['watch']);
 
     // Disable sync when watching
-    if(process.argv.indexOf('watch') !== -1 || process.argv.indexOf('default') !== -1 || process.argv.length <= 2) {
+    if (process.argv.indexOf('watch') !== -1 || process.argv.indexOf('default') !== -1 || process.argv.length <= 2) {
         $env.set('disable_sync', true);
     }
 
@@ -49,21 +49,26 @@ module.exports = function(gulp, $, $env) {
                     if (configuration.hasOwnProperty(task)) {
                         if (Array.isArray(configuration[task])) {
                             configuration[task].forEach(function (minorTask) {
-                                if (minorTask.hasOwnProperty('watch'))
+                                if (minorTask.hasOwnProperty('watch')) {
                                     src = src.concat(minorTask.watch);
-                                else if (minorTask.hasOwnProperty('src'))
+                                }
+                                else if (minorTask.hasOwnProperty('src')) {
                                     src = src.concat(minorTask.src);
+                                }
                             });
                         }
-                        else if (configuration[task].hasOwnProperty('watch'))
+                        else if (configuration[task].hasOwnProperty('watch')) {
                             src = src.concat(configuration[task].watch);
-                        else if (configuration[task].hasOwnProperty('src'))
+                        }
+                        else if (configuration[task].hasOwnProperty('src')) {
                             src = src.concat(configuration[task].src);
+                        }
                     }
                 });
 
-                if (src.length)
+                if (src.length) {
                     watchers[task] = gulp.watch(src, watchTasks[task]);
+                }
             }
         }
 
@@ -86,7 +91,7 @@ module.exports = function(gulp, $, $env) {
                                         $.remember.forget(name, event.path);
                                     }
 
-                                    if (name == 'js' && $.cached.caches.hasOwnProperty('js:lint') && $.cached.caches['js:lint'].hasOwnProperty(event.path)) {
+                                    if (name === 'js' && $.cached.caches.hasOwnProperty('js:lint') && $.cached.caches['js:lint'].hasOwnProperty(event.path)) {
                                         delete $.cached.caches['js:lint'][event.path];
                                         $.remember.forget('js:lint', event.path);
                                     }
@@ -100,12 +105,12 @@ module.exports = function(gulp, $, $env) {
     });
 
     // Set up watches for some JSON files
-    for(var file in watchFiles) {
-        if(watchFiles.hasOwnProperty(file)) {
-            gulp.task('watch:' + file, watchFiles[file], function(done) {
+    for (var file in watchFiles) {
+        if (watchFiles.hasOwnProperty(file)) {
+            gulp.task('watch:' + file, watchFiles[file], function (done) {
                 $env.set('disable_sync', true);
 
-                var callback = function() {
+                var callback = function () {
                     $env.set('disable_sync', false);
                     $env.server.reload();
                     done();

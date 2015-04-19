@@ -1,6 +1,6 @@
-module.exports = function(gulp, $, $env) {
+module.exports = function (gulp, $, $env) {
     var defaults = {
-            src: [
+            src:  [
                 '_assets/css'
             ],
             dest: 'public/css'
@@ -49,10 +49,11 @@ module.exports = function(gulp, $, $env) {
                 var src = configuration.css.hasOwnProperty('src') ? configuration.css.src : defaults.src,
                     dest = configuration.css.hasOwnProperty('dest') ? configuration.css.dest : defaults.dest;
 
-                addToStream(gulp.src(src)
+                addToStream(
+                    gulp.src(src)
                         .pipe($transform.css()())
                         .pipe(gulp.dest(dest))
-                        //.pipe($env.server.reload({stream: true}))
+                    //.pipe($env.server.reload({stream: true}))
                 );
             }
         }, done);
@@ -69,10 +70,11 @@ module.exports = function(gulp, $, $env) {
                         var src = configuration.css.merged[key].hasOwnProperty('src') ? configuration.css.merged[key].src : [defaults.src[0] + '/' + key],
                             concatToFile = configuration.css.merged[key].hasOwnProperty('file') ? configuration.css.merged[key].file : key + '.css';
 
-                        addToStream(gulp.src(src)
+                        addToStream(
+                            gulp.src(src)
                                 .pipe($transform.css(concatToFile)())
                                 .pipe(gulp.dest(destDir))
-                                //.pipe($env.server.reload({stream: true}))
+                            //.pipe($env.server.reload({stream: true}))
                         );
                     }
                 }
