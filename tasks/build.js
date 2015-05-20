@@ -20,11 +20,12 @@ module.exports = function (gulp, $, $env) {
         syncOrNot = function (done) {
             var callback = function () {
                 $env.server.reload();
+                $env.trigger('built');
                 done();
             };
 
             if ($env.get('disable_sync')) {
-                $helpers.sequence(callback);
+                callback();
             }
             else {
                 $helpers.sequence('jekyll', callback);
