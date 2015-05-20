@@ -29,7 +29,37 @@ module.exports = function (gulp, $, $env) {
                 configurationToCheck = $env.project().targets;
             }
 
-            var target = $.util.env.hasOwnProperty(envProperty) ? $.util.env[envProperty] : null, $target;
+            var target = $.util.env.hasOwnProperty(envProperty) ? $.util.env[envProperty] : null, $target,
+                applyToTarget = function($target, done, noManual) {
+                    $helpers.apply_to_array_or_one($target, function (configuration, incrementUpdates, incrementFinished, ifDone) {
+                        if (configuration.hasOwnProperty('target')) {
+                            configuration = $remote.find_target(configuration.target, configuration);
+
+                            $helpers.apply_to_array_or_one(configuration, function (targetConfig, targetIncrementUpdates, targetIncrementFinished, targetIfDone) {
+                                incrementUpdates();
+
+                                if(noManual && !$.util.env.all && targetConfig.hasOwnProperty('manual') && configuration.manual) {
+                                    targetIncrementFinished();
+                                    targetIfDone();
+                                }
+                                else {
+                                    onProcess(targetConfig, targetIncrementUpdates, targetIncrementFinished, targetIfDone);
+                                }
+                            }, function() {
+                                incrementFinished();
+                                ifDone();
+                            }, true);
+                        }
+                        else if(noManual && !$.util.env.all && configuration.hasOwnProperty('manual') && configuration.manual) {
+                            incrementUpdates();
+                            incrementFinished();
+                            ifDone();
+                        }
+                        else {
+                            onProcess(configuration, incrementUpdates, incrementFinished, ifDone);
+                        }
+                    }, done, true);
+                };
 
             if (target) {
                 $target = $remote.find_target(target);
@@ -41,14 +71,25 @@ module.exports = function (gulp, $, $env) {
                 }
 
                 $helpers.notify('Uploading to target: ' + target);
-
-                $helpers.apply_to_array_or_one($target, onProcess, onFinished, true);
+                applyToTarget($target, onFinished);
             }
             else {
                 $helpers.notify('Uploading to all targets');
 
+                var total = 2,
+                    finished = 0,
+                    done = function() {
+                        finished++;
+
+                        if(finished >= total) {
+                            onFinished();
+                        }
+                    };
+
                 for (target in configurationToCheck) {
                     if (configurationToCheck.hasOwnProperty(target) && ($.util.env.all || !configurationToCheck[target].hasOwnProperty('manual') || !configurationToCheck[target].manual)) {
+                        total++;
+
                         $helpers.notify('Executing target: ' + target);
 
                         if (configurationToCheck[target].hasOwnProperty('target')) {
@@ -58,7 +99,7 @@ module.exports = function (gulp, $, $env) {
                             $target = configurationToCheck[target];
                         }
 
-                        $helpers.apply_to_array_or_one($target, onProcess, onFinished, true);
+                        applyToTarget($target, done, true);
                     }
                 }
             }
