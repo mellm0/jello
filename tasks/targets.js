@@ -241,7 +241,7 @@ module.exports = function (gulp, $, $env) {
                     $helpers.notify('Command has been executed on ' + target);
                     incrementFinished();
                     ifDone();
-                }, null, {pty: true, sudoPassword: sudoPassword});
+                }, null, {sudoPassword: sudoPassword});
             }, done, true);
         }
         else {
