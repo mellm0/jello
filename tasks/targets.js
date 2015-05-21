@@ -17,7 +17,7 @@ module.exports = function (gulp, $, $env) {
                 }
             }
 
-            return {};
+            return false;
         },
 
         applyToOneOrAllTargets = function (onProcess, onFinished, configurationToCheck, envProperty) {
@@ -194,6 +194,55 @@ module.exports = function (gulp, $, $env) {
                     ifDone();
                 }, ['deploy-backups', 'push-backups']);
             }, done, $env.project().deploy.targets);
+        }
+        else {
+            done();
+        }
+    });
+
+    gulp.task('targets:command', ['start'], function (done) {
+        if (isAvailable()) {
+            var target = $.util.env.on ? $.util.env.on : getDefaultTarget();
+
+            if (!target) {
+                $helpers.notify('You have no targets set up in your targets configuration', true);
+                done();
+                return;
+            }
+
+            var $target = $remote.find_target(target);
+
+            if ($target === false) {
+                $helpers.notify('There are no settings for the target: ' + target, true);
+                done();
+                return;
+            }
+
+            var command = $.util.env.command ? $.util.env.command : '',
+                index = $.util.env.i ? $.util.env.i : false,
+                sudoPassword = $.util.env.pass ? $.util.env.pass : false,
+                count = 0;
+
+            if (!command) {
+                $helpers.notify('Please set a command to execute (--command="")', true);
+                done();
+                return;
+            }
+
+            $helpers.notify('Executing command on target: ' + target);
+
+            $helpers.apply_to_array_or_one($target, function (configuration, incrementUpdates, incrementFinished, ifDone) {
+                incrementUpdates();
+                count++;
+
+                if(index && index != count) return;
+
+                $remote.execute([command], configuration, function () {
+                    $helpers.notify('Command has been executed on ' + target);
+                    incrementFinished();
+                    ifDone();
+                }, null, {pty: true, sudoPassword: sudoPassword});
+            }, done, true);
         }
         else {
             done();
