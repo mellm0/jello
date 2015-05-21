@@ -174,7 +174,7 @@ module.exports = function (gulp, $, $env) {
                     incrementFinished();
                     ifDone();
                 }, type + '-backups', true, function (dest, src, options) {
-                    $helpers.notify(src + ' has been backed up to: ' + dest);
+                    //$helpers.notify(src + ' has been backed up to: ' + dest);
                 });
             }, done, null, 'target');
         }
