@@ -248,4 +248,42 @@ module.exports = function (gulp, $, $env) {
             done();
         }
     });
+
+    gulp.task('targets:do', ['start'], function (done) {
+        var command = $.util.env.command ? $.util.env.command : '';;
+
+        if (!command) {
+            $helpers.notify('Please set a command to execute (--command="")', true);
+            done();
+            return;
+        }
+
+        if (isAvailable()) {
+            var sudoPassword = $.util.env.pass ? $.util.env.pass : false;
+
+            applyToOneOrAllTargets(function (configuration, incrementUpdates, incrementFinished, ifDone) {
+                incrementUpdates();
+
+                $remote.execute_src_and_dest(
+                    'dest-commands-'+command,
+                    'src-commands-'+command,
+                    null,
+                    null,
+                    configuration,
+                    function (dest, src, options, commandsDone) {
+                        if(commandsDone && commandsDone.length)
+                            $helpers.notify(commandsDone.join(' and ') + ' has been executed');
+                        else
+                            $helpers.notify('dest-commands-'+command+' or src-commands-'+command+' unavailable in this configuration');
+                        incrementFinished();
+                        ifDone();
+                    },
+                    {sudoPassword: sudoPassword}
+                );
+            }, done, null, 'on');
+        }
+        else {
+            done();
+        }
+    });
 };
