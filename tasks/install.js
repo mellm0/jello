@@ -7,7 +7,7 @@ module.exports = function (gulp, $, $env) {
         ];
 
     // Install bower packages
-    gulp.task('install:bower', function (done) {
+    gulp.task('install:bower', ['start'], function (done) {
         if ($env.shell.which('bower')) {
             var installed = [];
 
