@@ -12,10 +12,10 @@ module.exports = function (gulp, $, $env) {
             var installed = [];
 
             $env.apply_to_all(function (configuration, incrementUpdates, incrementFinished, ifDone) {
-                var folder = configuration.moduleFolder ? configuration.moduleFolder + '/' : '',
+                var folder = configuration.hasOwnProperty('moduleFolder') ? configuration.moduleFolder + '/' : '',
                     command = folder ? '(cd ' + folder + ' && bower install)' : 'bower install';
 
-                if ($env.shell.test('-f', folder + 'bower.json')) {
+                if (folder && $env.shell.test('-f', folder + 'bower.json')) {
                     incrementUpdates();
 
                     $.util.log('Installing bower packages for folder: ' + folder);
@@ -27,11 +27,19 @@ module.exports = function (gulp, $, $env) {
                     });
                 }
             }, function () {
-                if (installed.length) {
-                    $helpers.notify('Installed bower packages for: ' + installed.join(', '));
-                }
+                if ($env.shell.test('-f', 'bower.json')) {
+                    $.util.log('Installing bower packages for project directory');
 
-                done();
+                    $env.shell.exec('bower install', function () {
+                        installed.push('(project directory)');
+                        $helpers.notify('Installed bower packages for: ' + installed.join(', '));
+                        done();
+                    });
+                }
+                else if (installed.length) {
+                    $helpers.notify('Installed bower packages for: ' + installed.join(', '));
+                    done();
+                }
             });
         }
         else {
