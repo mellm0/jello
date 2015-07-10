@@ -4,21 +4,24 @@ module.exports = function (gulp, $, $env) {
             'install:bower',
             'install:npm',
             'install:composer'
-        ];
+        ],
 
-    // Install bower packages
-    gulp.task('install:bower', ['start'], function (done) {
-        if ($env.shell.which('bower')) {
+        // Iterate through modules and install packages
+        // And then install packages in project directory, to allow overrides
+        installInModulesThenProject = function(packageFile, commandFn, packageType, callback, checkIfAlreadyAvailableFn) {
+            if(!packageType)
+                packageType = 'bower packages';
+
             var installed = [];
 
             $env.apply_to_all(function (configuration, incrementUpdates, incrementFinished, ifDone) {
                 var folder = configuration.hasOwnProperty('moduleFolder') ? configuration.moduleFolder + '/' : '',
-                    command = folder ? '(cd ' + folder + ' && bower install)' : 'bower install';
+                    command = commandFn(folder);
 
-                if (folder && $env.shell.test('-f', folder + 'bower.json')) {
+                if (folder && $env.shell.test('-f', folder + packageFile) && (!checkIfAlreadyAvailableFn || !checkIfAlreadyAvailableFn(packageFile, folder))) {
                     incrementUpdates();
 
-                    $.util.log('Installing bower packages for folder: ' + folder);
+                    $.util.log('Installing ' + packageType + ' for folder: ' + folder);
 
                     $env.shell.exec(command, function () {
                         installed.push(configuration.moduleFolder ? configuration.moduleFolder : '(project directory)');
@@ -27,20 +30,38 @@ module.exports = function (gulp, $, $env) {
                     });
                 }
             }, function () {
-                if ($env.shell.test('-f', 'bower.json')) {
-                    $.util.log('Installing bower packages for project directory');
+                if ($env.shell.test('-f', packageFile) && (!checkIfAlreadyAvailableFn || !checkIfAlreadyAvailableFn(packageFile))) {
+                    $.util.log('Installing ' + packageType + ' for project directory');
 
-                    $env.shell.exec('bower install', function () {
+                    $env.shell.exec(commandFn(), function () {
                         installed.push('(project directory)');
-                        $helpers.notify('Installed bower packages for: ' + installed.join(', '));
-                        done();
+                        $helpers.notify('Installed ' + packageType + ' for: ' + installed.join(', '));
+
+                        if(callback)
+                            callback();
                     });
                 }
                 else if (installed.length) {
-                    $helpers.notify('Installed bower packages for: ' + installed.join(', '));
-                    done();
+                    $helpers.notify('Installed ' + packageType + ' for: ' + installed.join(', '));
+
+                    if(callback)
+                        callback();
                 }
             });
+        },
+        getSubShelledCommand = function(commands, folder) {
+            if(folder)
+                commands.unshift('cd ' + folder);
+
+            return '(' + commands.join(' && ') + ')';
+        };
+
+    // Install bower packages
+    gulp.task('install:bower', ['start'], function (done) {
+        if ($env.shell.which('bower')) {
+            installInModulesThenProject('bower.json', function(folder) {
+                return folder ? getSubShelledCommand(['bower install'], folder) : 'bower install';
+            }, 'bower packages', done);
         }
         else {
             done();
@@ -48,12 +69,18 @@ module.exports = function (gulp, $, $env) {
     });
 
     // Install node packages
-    gulp.task('install:npm', function (done) {
-        if ($env.shell.which('npm') && $env.shell.test('-f', 'package.json')) {
-            $.util.log('Installing node packages');
-            $env.shell.exec('npm install', function () {
-                $helpers.notify('Installed node packages');
-                done();
+    gulp.task('install:npm', ['start'], function (done) {
+        if ($env.shell.which('npm')) {
+            installInModulesThenProject('package.json', function(folder) {
+                return folder ? getSubShelledCommand([
+                    'npm install',
+                    'rsync -av node_modules/ ../node_modules/',
+                    'rm -rf node_modules'
+                ], folder) : 'npm install';
+            }, 'node packages', done, function(packageFile, folder) {
+                if(!folder) return false;
+
+                return false;
             });
         }
         else {
