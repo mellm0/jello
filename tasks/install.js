@@ -18,9 +18,9 @@ module.exports = function (gulp, $, $env) {
                 var folder = configuration.hasOwnProperty('moduleFolder') ? configuration.moduleFolder + '/' : '',
                     command = commandFn(folder);
 
-                if (folder && $env.shell.test('-f', folder + packageFile) && (!checkIfAlreadyAvailableFn || !checkIfAlreadyAvailableFn(packageFile, folder))) {
-                    incrementUpdates();
+                incrementUpdates();
 
+                if (folder && $env.shell.test('-f', folder + packageFile) && (!checkIfAlreadyAvailableFn || !checkIfAlreadyAvailableFn(packageFile, folder))) {
                     $.util.log('Installing ' + packageType + ' for folder: ' + folder);
 
                     $env.shell.exec(command, function () {
@@ -28,6 +28,10 @@ module.exports = function (gulp, $, $env) {
                         incrementFinished();
                         ifDone();
                     });
+                }
+                else {
+                    incrementFinished();
+                    ifDone();
                 }
             }, function () {
                 if ($env.shell.test('-f', packageFile) && (!checkIfAlreadyAvailableFn || !checkIfAlreadyAvailableFn(packageFile))) {
@@ -47,7 +51,7 @@ module.exports = function (gulp, $, $env) {
                     if(callback)
                         callback();
                 }
-            });
+            }, true);
         },
         getSubShelledCommand = function(commands, folder) {
             if(folder)
@@ -73,15 +77,11 @@ module.exports = function (gulp, $, $env) {
         if ($env.shell.which('npm')) {
             installInModulesThenProject('package.json', function(folder) {
                 return folder ? getSubShelledCommand([
-                    'npm install',
-                    'rsync -av node_modules/ ../node_modules/',
-                    'rm -rf node_modules'
+                    $.util.env.installDevModules ? 'npm install' : 'npm install --production',
+                    "if [ -d 'node_modules' ]; then rsync -av node_modules/ ../node_modules/; fi",
+                    "if [ -d 'node_modules' ]; then rm -rf node_modules; fi"
                 ], folder) : 'npm install';
-            }, 'node packages', done, function(packageFile, folder) {
-                if(!folder) return false;
-
-                return false;
-            });
+            }, 'node packages', done);
         }
         else {
             done();
