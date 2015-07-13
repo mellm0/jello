@@ -1,51 +1,36 @@
 module.exports = function (gulp, $, $env) {
     var defaults = {
         src:  [
-            '_assets/images'
+            '_assets/images',
+            '!_assets/images/_*',
+            '!_assets/images/_*/**/*'
         ],
         dest: 'public/images'
-    };
+    },
+        $helpers = require("../lib/helpers")(gulp, $, $env),
+        $transform = require("../lib/transformers")(gulp, $, $env);
 
     // Delete Images
     gulp.task('images:clean', ['start'], function (done) {
-        $env.apply_to_all(function (configuration, incrementUpdates, incrementFinished, ifDone) {
-            if (configuration.hasOwnProperty('images')) {
-                incrementUpdates();
+        $env.apply_to_config(function (configuration, incrementUpdates, incrementFinished, ifDone) {
+            incrementUpdates();
 
-                var src = configuration.images.hasOwnProperty('dest') ? configuration.images.dest : defaults.dest;
-
-                $env.delete(src, function () {
-                    incrementFinished();
-                    ifDone();
-                });
-            }
-        }, done);
+            $env.delete($helpers.config.getDeleteGlob(configuration), function () {
+                incrementFinished();
+                ifDone();
+            });
+        }, done, false, 'images', false, $helpers.config.canDelete);
     });
 
     // Minimise images
     gulp.task('images', ['start', 'images:clean'], function (done) {
-        return $env.apply_to_all_and_stream(function (configuration, addToStream) {
-            if (configuration.hasOwnProperty('images')) {
-                var src = configuration.images.hasOwnProperty('src') ? configuration.images.src : defaults.src,
-                    dest = configuration.images.hasOwnProperty('dest') ? configuration.images.dest : defaults.dest,
-                    imagesOnly = $.filter(['**/*.jpg', '**/*.gif', '**/*.png']),
-                    svgOnly = $.filter('**/*.svg');
-
-                addToStream(
-                    gulp.src(src)
-                        //.pipe($.plumber())
-                        //.pipe(use.cached('images'))
-                        .pipe(imagesOnly)
-                        .pipe($.util.env.dev ? $.util.noop() : $.imagemin())
-                        .pipe(imagesOnly.restore())
-                        .pipe(svgOnly)
-                        .pipe($.util.env.dev ? $.util.noop() : $.svgmin())
-                        .pipe(svgOnly.restore())
-                        //.pipe(use.remember('images'))
-                        .pipe(gulp.dest(dest))
-                    //.pipe($env.server.reload({stream: true}))
-                );
-            }
-        }, done);
+        return $env.apply_to_config_and_stream(function (configuration, addToStream) {
+            addToStream(
+                gulp.src(configuration.src)
+                    .pipe($transform.images(configuration)())
+                    .pipe(gulp.dest(configuration.dest))
+                //.pipe($env.server.reload({stream: true}))
+            );
+        }, done, 'images', false, false, defaults);
     });
 };

@@ -2,8 +2,8 @@ module.exports = function (gulp, $, $env) {
     var $helpers = require("../lib/helpers")(gulp, $, $env),
         tasks = {
             assets: {
-                'build:css':     ['css:single', 'css:merged'],
-                'build:js':      ['js:single', 'js:merged'],
+                'build:css':     ['css'],
+                'build:js':      ['js'],
                 'build:html':    ['html'],
                 'build:images':  ['images'],
                 'build:sprites': ['sprites'],
@@ -32,7 +32,7 @@ module.exports = function (gulp, $, $env) {
                 callback();
             }
             else {
-                $helpers.sequence('jekyll', callback);
+                $helpers.sequence.use(gulp)('jekyll', callback);
             }
         },
 

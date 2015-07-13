@@ -71,7 +71,7 @@ module.exports = function (gulp, $, $env) {
                             return function() {
                                 $env.set('configuration_override', config);
 
-                                $helpers.sequence(tasks, function() {
+                                $helpers.sequence.use(gulp)(tasks, function() {
                                     $env.set('configuration_override', null);
                                 });
                             };
@@ -99,9 +99,9 @@ module.exports = function (gulp, $, $env) {
                                     $.remember.forget(name, event.path);
                                 }
 
-                                if (name === 'js' && $.cached.caches.hasOwnProperty('js:lint') && $.cached.caches['js:lint'].hasOwnProperty(event.path)) {
-                                    delete $.cached.caches['js:lint'][event.path];
-                                    $.remember.forget('js:lint', event.path);
+                                if (name === 'js' && $.cached.caches.hasOwnProperty('js.lint') && $.cached.caches['js.lint'].hasOwnProperty(event.path)) {
+                                    delete $.cached.caches['js.lint'][event.path];
+                                    $.remember.forget('js.lint', event.path);
                                 }
                             }
                         });
@@ -123,7 +123,7 @@ module.exports = function (gulp, $, $env) {
                     done();
                 };
 
-                $helpers.sequence(
+                $helpers.sequence.use(gulp)(
                     'build',
                     'jekyll',
                     callback

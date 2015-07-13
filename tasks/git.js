@@ -198,10 +198,10 @@ module.exports = function (gulp, $, $env) {
             $env.shell.exec('grep -lr \'<<<<<<<\' . --exclude-dir=' + excludedDirectories.join(' --exclude-dir=') + ' | xargs git checkout' + accept);
 
             if ($.util.env.deploy) {
-                $helpers.sequence('deploy', done());
+                $helpers.sequence.use(gulp)('deploy', done());
             }
             else if ($.util.env.gitDeploy) {
-                $helpers.sequence('git:deploy', done());
+                $helpers.sequence.use(gulp)('git:deploy', done());
             }
             else {
                 done();

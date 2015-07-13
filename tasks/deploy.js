@@ -7,6 +7,6 @@ module.exports = function (gulp, $, $env) {
 
     // Execute all deploy tasks (it does it in sequence, so you can solve issues one at a time)
     gulp.task('deploy', function (done) {
-        $helpers.sequence.apply(this, ['build'].concat(deployTasks).concat([done]));
+        $helpers.sequence.use(gulp).apply(this, ['build'].concat(deployTasks).concat([done]));
     });
 };
