@@ -1,12 +1,5 @@
 module.exports = function (gulp, $, $env) {
-    var defaults = {
-            src:    [
-                '_assets/sprites'
-            ],
-            dest:   'public/sprites',
-            config: {}
-        },
-
+    var $defaults = require("../lib/defaults")(gulp, $, $env),
         $transform = require("../lib/transformers")(gulp, $, $env),
         $helpers = require("../lib/helpers")(gulp, $, $env),
         validItem = function (configuration) {
@@ -22,7 +15,7 @@ module.exports = function (gulp, $, $env) {
                 incrementFinished();
                 ifDone();
             });
-        }, done, false, 'sprites', false, $helpers.config.canDelete);
+        }, done, false, 'sprites', false, $helpers.config.canDelete, $defaults.sprites);
     });
 
     // Merge SVG sprites into one file
@@ -34,6 +27,6 @@ module.exports = function (gulp, $, $env) {
                     .pipe(gulp.dest(configuration.dest))
                 //.pipe($env.server.reload({stream: true}))
             );
-        }, done, 'sprites', false, validItem, defaults);
+        }, done, 'sprites', false, validItem, $defaults.sprites);
     });
 };

@@ -1,15 +1,5 @@
 module.exports = function (gulp, $, $env) {
-    var defaults = {
-            src:  [
-                '_assets/js/**/*',
-                '!_assets/js/_*',
-                '!_assets/js/_*/**/*'
-            ],
-            watch: [
-                '_assets/js/**/*'
-            ],
-            dest: 'public/js'
-        },
+    var $defaults = require("../lib/defaults")(gulp, $, $env),
         $helpers = require("../lib/helpers")(gulp, $, $env),
         $transform = require("../lib/transformers")(gulp, $, $env);
 
@@ -22,7 +12,7 @@ module.exports = function (gulp, $, $env) {
                 incrementFinished();
                 ifDone();
             });
-        }, done, false, 'js', false, $helpers.config.canDelete, defaults);
+        }, done, false, 'js', false, $helpers.config.canDelete, $defaults.js);
     });
 
     // Process JS files, including uglify and coffee script
@@ -36,7 +26,7 @@ module.exports = function (gulp, $, $env) {
                     .pipe(gulp.dest(configuration.dest))
                 //.pipe($env.server.reload({stream: true}))
             );
-        }, done, 'js', false, false, defaults);
+        }, done, 'js', false, false, $defaults.js);
     });
 
     // Lint JS files

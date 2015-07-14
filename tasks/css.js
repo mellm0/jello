@@ -1,30 +1,5 @@
 module.exports = function (gulp, $, $env) {
-    var defaults = {
-            src:  [
-                '_assets/css/**/*',
-                '!_assets/css/_*',
-                '!_assets/css/_*/**/*'
-            ],
-            watch: [
-                '_assets/css/**/*'
-            ],
-            dest: 'public/css',
-            autoprefix: {
-                browsers: [
-                    'last 10 versions', 'safari 5', 'ie 8', 'ie 9', 'opera 12.1', 'ios 6', 'android 4'
-                ]
-            },
-            less: {
-                compress: false,
-                cleancss: false,
-                lint: true
-            },
-            sass: {},
-            minify: {
-                keepSpecialComments: 0,
-                processImport: false
-            }
-        },
+    var $defaults = require("../lib/defaults")(gulp, $, $env),
         $helpers = require("../lib/helpers")(gulp, $, $env),
         $transform = require("../lib/transformers")(gulp, $, $env);
 
@@ -37,7 +12,7 @@ module.exports = function (gulp, $, $env) {
                 incrementFinished();
                 ifDone();
             });
-        }, done, false, 'css', false, $helpers.config.canDelete, defaults);
+        }, done, false, 'css', false, $helpers.config.canDelete, $defaults.css);
     });
 
     // Process css files, including less and scss, and minify
@@ -51,6 +26,6 @@ module.exports = function (gulp, $, $env) {
                     .pipe(gulp.dest(configuration.dest))
                     //.pipe($env.server.reload({stream: true}))
             );
-        }, done, 'css', false, false, defaults);
+        }, done, 'css', false, false, $defaults.css);
     });
 };

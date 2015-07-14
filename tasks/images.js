@@ -1,12 +1,5 @@
 module.exports = function (gulp, $, $env) {
-    var defaults = {
-        src:  [
-            '_assets/images',
-            '!_assets/images/_*',
-            '!_assets/images/_*/**/*'
-        ],
-        dest: 'public/images'
-    },
+    var $defaults = require("../lib/defaults")(gulp, $, $env),
         $helpers = require("../lib/helpers")(gulp, $, $env),
         $transform = require("../lib/transformers")(gulp, $, $env);
 
@@ -19,7 +12,7 @@ module.exports = function (gulp, $, $env) {
                 incrementFinished();
                 ifDone();
             });
-        }, done, false, 'images', false, $helpers.config.canDelete);
+        }, done, false, 'images', false, $helpers.config.canDelete, $defaults.images);
     });
 
     // Minimise images
@@ -31,6 +24,6 @@ module.exports = function (gulp, $, $env) {
                     .pipe(gulp.dest(configuration.dest))
                 //.pipe($env.server.reload({stream: true}))
             );
-        }, done, 'images', false, false, defaults);
+        }, done, 'images', false, false, $defaults.images);
     });
 };

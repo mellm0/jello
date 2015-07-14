@@ -1,5 +1,6 @@
 module.exports = function (gulp, $, $env) {
-    var $helpers = require("../lib/helpers")(gulp, $, $env),
+    var $defaults = require("../lib/defaults")(gulp, $, $env),
+        $helpers = require("../lib/helpers")(gulp, $, $env),
         watchFiles = {
             'assets.json':   ['reconfigure'],
             'bower.json':    ['install:bower'],
@@ -50,6 +51,9 @@ module.exports = function (gulp, $, $env) {
                     if (configuration.hasOwnProperty(task)) {
                         if (Array.isArray(configuration[task])) {
                             configuration[task].forEach(function (minorTask) {
+                                if($defaults.hasOwnProperty(task))
+                                    minorTask = $helpers.merge_objects($defaults[task], minorTask);
+
                                 if (minorTask.hasOwnProperty('watch')) {
                                     src = src.concat(minorTask.watch);
                                 }
@@ -58,11 +62,16 @@ module.exports = function (gulp, $, $env) {
                                 }
                             });
                         }
-                        else if (configuration[task].hasOwnProperty('watch')) {
-                            src = src.concat(configuration[task].watch);
-                        }
-                        else if (configuration[task].hasOwnProperty('src')) {
-                            src = src.concat(configuration[task].src);
+                        else {
+                            if($defaults.hasOwnProperty(task))
+                                configuration[task] = $helpers.merge_objects($defaults[task], configuration[task]);
+
+                            if (configuration[task].hasOwnProperty('watch')) {
+                                src = src.concat(configuration[task].watch);
+                            }
+                            else if (configuration[task].hasOwnProperty('src')) {
+                                src = src.concat(configuration[task].src);
+                            }
                         }
                     }
 
