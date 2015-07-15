@@ -10,6 +10,9 @@ module.exports = function (gulp, $, $env) {
             return {
                 command: commandFn,
                 canExecute: function(folder) {
+                    if(typeof folder === 'undefined')
+                        folder = '';
+
                     return $env.shell.test('-f', folder + packageFile);
                 },
                 before: function(folder) {
@@ -20,7 +23,7 @@ module.exports = function (gulp, $, $env) {
                 after: function(folder, installed) {
                     if(folder)
                         $.util.log('Installed ' + packageType + ' for ' + folder);
-                    else if(installed.length) {
+                    else if(installed) {
                         installed.push('project directory');
                         $helpers.notify('Installed ' + packageType + ' for: ' + installed.join(', '));
                     }

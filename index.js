@@ -42,7 +42,6 @@ module.exports = function (gulp, tasks) {
         tasks = [
             './tasks/watchers',
             './tasks/deploy',
-            './tasks/build',
             './tasks/utilities',
             './tasks/server',
             './tasks/css',
@@ -52,6 +51,7 @@ module.exports = function (gulp, tasks) {
             './tasks/html',
             './tasks/jekyll',
             './tasks/copy',
+            './tasks/build',
             './tasks/install',
             './tasks/update',
             './tasks/git',

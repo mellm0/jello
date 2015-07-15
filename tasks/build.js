@@ -43,14 +43,14 @@ module.exports = function (gulp, $, $env) {
         startAssetTasks = function() {
             for (var task in tasks.assets) {
                 if (tasks.assets.hasOwnProperty(task)) {
-                    gulp.task(task, tasks.assets[task], function(done) {
+                    gulp.task(task, tasks.assets[task], (function (task) { return function(done) {
                         syncOrNot(done, task);
-                    }(task));
+                    };})(task));
                 }
             }
         },
 
-        // Build all assets
+    // Build all assets
         startBuildTasks = function() {
             var buildTasks = tasks.build;
 
