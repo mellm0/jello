@@ -4,35 +4,36 @@ module.exports = function (gulp, $, $env) {
             'update:bower',
             'update:npm',
             'update:composer'
-        ];
+        ],
+
+        getOptionsForExecution = function(commandFn, packageFile, packageType) {
+            return {
+                command: commandFn,
+                canExecute: function(folder) {
+                    return $env.shell.test('-f', folder + packageFile);
+                },
+                before: function(folder) {
+                    folder = folder ? 'folder: ' + folder : 'project directory';
+
+                    $.util.log('Updating ' + packageType + ' for ' + folder);
+                },
+                after: function(folder, installed) {
+                    if(folder)
+                        $.util.log('Updated ' + packageType + ' for ' + folder);
+                    else if(installed.length) {
+                        installed.push('project directory');
+                        $helpers.notify('Updated ' + packageType + ' for: ' + installed.join(', '));
+                    }
+                }
+            };
+        };
 
     // Update bower packages
     gulp.task('update:bower', function (done) {
         if ($env.shell.which('bower')) {
-            var installed = [];
-
-            $env.apply_to_all(function (configuration, incrementUpdates, incrementFinished, ifDone) {
-                var folder = configuration.moduleFolder ? configuration.moduleFolder + '/' : '',
-                    command = folder ? '(cd ' + folder + ' && bower update)' : 'bower update';
-
-                if ($env.shell.test('-f', folder + 'bower.json')) {
-                    incrementUpdates();
-
-                    $.util.log('Updating bower packages for folder: ' + folder);
-
-                    $env.shell.exec(command, function () {
-                        installed.push(configuration.moduleFolder ? configuration.moduleFolder : '(project directory)');
-                        incrementFinished();
-                        ifDone();
-                    });
-                }
-            }, function () {
-                if (installed.length) {
-                    $helpers.notify('Updated bower packages for: ' + installed.join(', '));
-                }
-
-                done();
-            });
+            $env.execute_on_modules_then_project(getOptionsForExecution(function(folder) {
+                return $helpers.get_sub_shelled_command(['bower update'], folder);
+            }, 'bower.json', 'bower packages'), done);
         }
         else {
             done();

@@ -16,15 +16,19 @@ module.exports = function (gulp, $, $env) {
                 'build:images',
                 'build:sprites',
                 'build:copy'
+            ],
+            'build-after': [
+                'jekyll'
             ]
         },
 
         buildTasksHasBeenReset = false,
 
-        syncOrNot = function (done) {
+        syncOrNot = function (done, task) {
             var callback = function () {
+                var event = task ? 'built:' + task : 'built';
                 $env.server.reload();
-                $env.trigger('built');
+                $env.trigger(event);
                 done();
             };
 
@@ -32,14 +36,16 @@ module.exports = function (gulp, $, $env) {
                 callback();
             }
             else {
-                $helpers.sequence.use(gulp)('jekyll', callback);
+                $helpers.sequence.use(gulp)(tasks['build-after'], callback);
             }
         },
 
         startAssetTasks = function() {
             for (var task in tasks.assets) {
                 if (tasks.assets.hasOwnProperty(task)) {
-                    gulp.task(task, tasks.assets[task], syncOrNot);
+                    gulp.task(task, tasks.assets[task], function(done) {
+                        syncOrNot(done, task);
+                    }(task));
                 }
             }
         },
@@ -51,10 +57,19 @@ module.exports = function (gulp, $, $env) {
             if(buildTasks.indexOf('start') === -1)
                 buildTasks.unshift('start');
 
-            gulp.task('build', buildTasks);
+            gulp.task('build', function(done) {
+                $env.set('disable_sync', true);
+
+                $helpers.sequence.use(gulp)(buildTasks, tasks['build-after'], function() {
+                    $env.set('disable_sync', false);
+                    $env.server.reload();
+                    $env.trigger('built');
+                    done();
+                });
+            });
 
             return true;
-        }
+        },
 
         resetGulp = function() {
             gulp.on('stop', function () {

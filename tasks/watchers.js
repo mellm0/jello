@@ -13,19 +13,14 @@ module.exports = function (gulp, $, $env) {
             'images':  ['build:images'],
             'copy':    ['build:copy'],
             'html':    ['build:html'],
-            'sprites': ['build:sprites']
+            'sprites': ['build:sprites'],
+            'jekyll':  ['jekyll']
         };
 
     // Default task is to watch assets
     gulp.task('default', ['watch']);
 
-    // Disable sync when watching
-    if (process.argv.indexOf('watch') !== -1 || process.argv.indexOf('default') !== -1 || process.argv.length <= 2) {
-        $env.set('disable_sync', true);
-    }
-
     gulp.task('watch', ['start', 'server', 'build'], function () {
-        $env.set('disable_sync', false);
         $env.server.reload();
 
         var watchers = {},
@@ -124,18 +119,12 @@ module.exports = function (gulp, $, $env) {
     for (var file in watchFiles) {
         if (watchFiles.hasOwnProperty(file)) {
             gulp.task('watch:' + file, watchFiles[file], function (done) {
-                $env.set('disable_sync', true);
-
-                var callback = function () {
-                    $env.set('disable_sync', false);
-                    $env.server.reload();
-                    done();
-                };
-
                 $helpers.sequence.use(gulp)(
                     'build',
-                    'jekyll',
-                    callback
+                    function () {
+                        $env.server.reload();
+                        done();
+                    }
                 );
             });
         }
