@@ -40,6 +40,6 @@ module.exports = function (gulp, $, $env) {
             );
         }, done, 'js', false, function(configuration) {
             return configuration.hasOwnProperty('lint');
-        }, defaults);
+        }, $defaults.js);
     });
 };
