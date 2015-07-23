@@ -24,65 +24,97 @@ module.exports = function (gulp, $, $env) {
         $env.server.reload();
 
         var watchers = {},
-            configurations = $env.start();
+            configurations = $env.start(),
+            watchFunction = function (tasks, config) {
+                return function () {
+                    $env.set('configuration_override', config);
+
+                    $helpers.sequence.use(gulp)(tasks, function () {
+                        $env.set('configuration_override', null);
+                    });
+                };
+            };
 
         for (var file in watchFiles) {
-            if (watchFiles.hasOwnProperty(file)) {
-                if (file === 'assets.json') {
-                    watchers[file] = gulp.watch($env.configuration_files, ['watch:' + file]);
-                }
-                else {
-                    watchers[file] = gulp.watch(file, ['watch:' + file]);
-                }
+            if (!watchFiles.hasOwnProperty(file)) {
+                continue;
+            }
+
+            if (file === 'assets.json') {
+                watchers[file] = gulp.watch($env.configuration_files, ['watch:' + file]);
+            }
+            else {
+                watchers[file] = gulp.watch(file, ['watch:' + file]);
             }
         }
 
         for (var task in watchTasks) {
-            if (watchTasks.hasOwnProperty(task)) {
-                configurations.forEach(function (configuration) {
-                    var src = [],
-                        taskName = configuration.hasOwnProperty('moduleFolder') ? configuration.moduleFolder + ':' + task : task;
-
-                    if (configuration.hasOwnProperty(task)) {
-                        if (Array.isArray(configuration[task])) {
-                            configuration[task].forEach(function (minorTask) {
-                                if($defaults.hasOwnProperty(task))
-                                    minorTask = $helpers.merge_objects($defaults[task], minorTask);
-
-                                if (minorTask.hasOwnProperty('watch')) {
-                                    src = src.concat(minorTask.watch);
-                                }
-                                else if (minorTask.hasOwnProperty('src')) {
-                                    src = src.concat(minorTask.src);
-                                }
-                            });
-                        }
-                        else {
-                            if($defaults.hasOwnProperty(task))
-                                configuration[task] = $helpers.merge_objects($defaults[task], configuration[task]);
-
-                            if (configuration[task].hasOwnProperty('watch')) {
-                                src = src.concat(configuration[task].watch);
-                            }
-                            else if (configuration[task].hasOwnProperty('src')) {
-                                src = src.concat(configuration[task].src);
-                            }
-                        }
-                    }
-
-                    if (src.length) {
-                        watchers[taskName] = gulp.watch(src, function(tasks, config){
-                            return function() {
-                                $env.set('configuration_override', config);
-
-                                $helpers.sequence.use(gulp)(tasks, function() {
-                                    $env.set('configuration_override', null);
-                                });
-                            };
-                        }(watchTasks[task], configuration));
-                    }
-                });
+            if (!watchTasks.hasOwnProperty(task)) {
+                continue;
             }
+            configurations.forEach(function (configuration) {
+                if (!configuration.hasOwnProperty(task)) {
+                    return true;
+                }
+
+                var defaults = {},
+                    src = [],
+                    taskName = configuration.hasOwnProperty('moduleFolder') ? configuration.moduleFolder + ':' + task : task;
+
+                if (Array.isArray(configuration[task])) {
+                    configuration[task].forEach(function (minorTask) {
+                        if ($defaults.hasOwnProperty(task)) {
+                            defaults = $helpers.merge_objects({}, $defaults[task]);
+
+                            if (configuration.moduleFolder) {
+                                if (!minorTask.hasOwnProperty('watch') && defaults.watch) {
+                                    defaults.watch = $helpers.append_folder_to_glob(configuration.moduleFolder, defaults.watch);
+                                }
+                                if (!minorTask.hasOwnProperty('src') && defaults.src) {
+                                    defaults.src = $helpers.append_folder_to_glob(configuration.moduleFolder, defaults.src);
+                                }
+                            }
+
+                            minorTask = $helpers.merge_objects(defaults, minorTask);
+                        }
+
+                        if (minorTask.hasOwnProperty('watch')) {
+                            src = src.concat(minorTask.watch);
+                        }
+                        else if (minorTask.hasOwnProperty('src') && minorTask.watch != '$src') {
+                            src = src.concat(minorTask.src);
+                        }
+                    });
+                }
+                else {
+                    if ($defaults.hasOwnProperty(task)) {
+                        defaults = $helpers.merge_objects({}, $defaults[task]);
+
+                        if (configuration.moduleFolder) {
+                            if (!configuration.hasOwnProperty('watch') && defaults.watch) {
+                                defaults.watch = $helpers.append_folder_to_glob(configuration.moduleFolder, defaults.watch);
+                            }
+                            if (!configuration.hasOwnProperty('src') && defaults.src) {
+                                defaults.src = $helpers.append_folder_to_glob(configuration.moduleFolder, defaults.src);
+                            }
+                        }
+
+                        configuration[task] = $helpers.merge_objects(defaults, configuration[task]);
+                    }
+
+                    if (configuration[task].hasOwnProperty('watch') && configuration[task].watch != '$src') {
+                        src = src.concat(configuration[task].watch);
+                    }
+                    else if (configuration[task].hasOwnProperty('src')) {
+                        src = src.concat(configuration[task].src);
+                    }
+                }
+
+                if (src.length) {
+                    var config = JSON.parse(JSON.stringify(configuration));
+                    watchers[taskName] = gulp.watch(src, watchFunction(watchTasks[task], config));
+                }
+            });
         }
 
         if ($env.project().hasOwnProperty('refresh')) {
