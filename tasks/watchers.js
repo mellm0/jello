@@ -25,7 +25,7 @@ module.exports = function (gulp, $, $env) {
 
         var watchers = {},
             configurations = $env.start(),
-            watchFunction = function (tasks, config) {
+            watchFunction = function (tasks, config, taskName) {
                 return function () {
                     $env.set('configuration_override', config);
 
@@ -66,16 +66,11 @@ module.exports = function (gulp, $, $env) {
                         if ($defaults.hasOwnProperty(task)) {
                             defaults = $helpers.merge_objects({}, $defaults[task]);
 
-                            if (configuration.moduleFolder) {
-                                if (!minorTask.hasOwnProperty('watch') && defaults.watch) {
-                                    defaults.watch = $helpers.append_folder_to_glob(configuration.moduleFolder, defaults.watch);
-                                }
-                                if (!minorTask.hasOwnProperty('src') && defaults.src) {
-                                    defaults.src = $helpers.append_folder_to_glob(configuration.moduleFolder, defaults.src);
-                                }
+                            if(configuration.hasOwnProperty('moduleFolder')) {
+                                defaults = $env.add_folder_to_all_vars(configuration.moduleFolder, $helpers.merge_objects({}, defaults), true);
                             }
 
-                            minorTask = $helpers.merge_objects(defaults, minorTask);
+                            minorTask = $helpers.merge_objects($defaults[task], minorTask);
                         }
 
                         if (minorTask.hasOwnProperty('watch')) {
@@ -90,13 +85,8 @@ module.exports = function (gulp, $, $env) {
                     if ($defaults.hasOwnProperty(task)) {
                         defaults = $helpers.merge_objects({}, $defaults[task]);
 
-                        if (configuration.moduleFolder) {
-                            if (!configuration.hasOwnProperty('watch') && defaults.watch) {
-                                defaults.watch = $helpers.append_folder_to_glob(configuration.moduleFolder, defaults.watch);
-                            }
-                            if (!configuration.hasOwnProperty('src') && defaults.src) {
-                                defaults.src = $helpers.append_folder_to_glob(configuration.moduleFolder, defaults.src);
-                            }
+                        if(configuration.hasOwnProperty('moduleFolder')) {
+                            defaults = $env.add_folder_to_all_vars(configuration.moduleFolder, $helpers.merge_objects({}, defaults), true);
                         }
 
                         configuration[task] = $helpers.merge_objects(defaults, configuration[task]);
@@ -112,7 +102,7 @@ module.exports = function (gulp, $, $env) {
 
                 if (src.length) {
                     var config = JSON.parse(JSON.stringify(configuration));
-                    watchers[taskName] = gulp.watch(src, watchFunction(watchTasks[task], config));
+                    watchers[taskName] = gulp.watch(src, watchFunction(watchTasks[task], config, taskName));
                 }
             });
         }
