@@ -70,7 +70,7 @@ module.exports = function (gulp, $, $env) {
                                 defaults = $env.add_folder_to_all_vars(configuration.moduleFolder, $helpers.merge_objects({}, defaults), true);
                             }
 
-                            minorTask = $helpers.merge_objects($defaults[task], minorTask);
+                            minorTask = $helpers.merge_objects(defaults, minorTask);
                         }
 
                         if (minorTask.hasOwnProperty('watch')) {
