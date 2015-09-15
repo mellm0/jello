@@ -40,13 +40,16 @@
     "request": "~2",
     "run-sequence": "~1",
     "shelljs": "~0.4",
-    "ssh2": "~0.4"
+    "ssh2": "~0.4",
+    "through2": "~2"
   },
   "optionalDependencies": {
     "browserify": "~10",
+    "gulp-babel": "~5",
     "gulp-cached": "~1",
     "gulp-changed": "~1",
     "gulp-remember": "~0.3",
+    "gulp-sourcemaps": "~1",
     "gulp-uncss": "~1"
   }
 }
