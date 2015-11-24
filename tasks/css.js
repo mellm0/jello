@@ -8,7 +8,7 @@ module.exports = function (gulp, $, $env) {
         $env.apply_to_config(function (configuration, incrementUpdates, incrementFinished, ifDone) {
             incrementUpdates();
 
-            $env.delete($helpers.config.getDeleteGlob(configuration), function () {
+            $env.delete($helpers.config.getDeleteGlob(configuration)).then(function () {
                 incrementFinished();
                 ifDone();
             });
