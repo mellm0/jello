@@ -2,7 +2,7 @@ module.exports = function (gulp, $, $env) {
     var $defaults = require("../lib/defaults")(gulp, $, $env),
         startPhp = function(options, cb) {
             if(options && (!options.hasOwnProperty('php') || !$env.shell.which('php'))) {
-                return;
+                return false;
             }
 
             var host = options.php !== true && options.php.hasOwnProperty('host') ? options.php.host : $defaults.php.host,
@@ -15,13 +15,19 @@ module.exports = function (gulp, $, $env) {
                     cb();
                 }
             });
+
+            return true;
         };
 
     // Start a browser sync server
     gulp.task('server', ['jekyll'], function (done) {
-        var options = $env.project().hasOwnProperty('server') ? $env.project().server : $defaults.server.options;
+        var options = $env.project().hasOwnProperty('server') ? $env.project().server : $defaults.server.options,
+            isPhp = startPhp(options);
 
-        startPhp(options);
+        if(isPhp) {
+            options.proxy = options.php !== true && options.php.hasOwnProperty('host') ? options.php.host : $defaults.php.host;
+            options.open = true;
+        }
 
         $env.server(options, function () {
             done();
