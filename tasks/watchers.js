@@ -73,10 +73,10 @@ module.exports = function (gulp, $, $env) {
                             minorTask = $helpers.merge_objects(defaults, minorTask);
                         }
 
-                        if (minorTask.hasOwnProperty('watch')) {
+                        if (minorTask.hasOwnProperty('watch') && minorTask.watch != '$src') {
                             src = src.concat(minorTask.watch);
                         }
-                        else if (minorTask.hasOwnProperty('src') && minorTask.watch != '$src') {
+                        else if (minorTask.hasOwnProperty('src')) {
                             src = src.concat(minorTask.src);
                         }
                     });
