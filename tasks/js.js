@@ -20,12 +20,21 @@ module.exports = function (gulp, $, $env) {
         return $env.apply_to_config_and_stream(function (configuration, addToStream) {
             configuration = $helpers.config.add_filename(configuration, 'js');
 
-            addToStream(
-                gulp.src(configuration.src)
-                    .pipe($transform.js(configuration)())
-                    .pipe(gulp.dest(configuration.dest))
-                //.pipe($env.server.reload({stream: true}))
-            );
+            if (configuration.browserify) {
+                addToStream(
+                    $transform.js(configuration)()
+                        .pipe(gulp.dest(configuration.dest))
+                    //.pipe($env.server.reload({stream: true}))
+                );
+            }
+            else {
+                addToStream(
+                    gulp.src(configuration.src)
+                        .pipe($transform.js(configuration)())
+                        .pipe(gulp.dest(configuration.dest))
+                    //.pipe($env.server.reload({stream: true}))
+                );
+            }
         }, done, 'js', false, false, $defaults.js);
     });
 
@@ -38,7 +47,7 @@ module.exports = function (gulp, $, $env) {
                 gulp.src(configuration.lint)
                     .pipe($transform.js_lint(configuration)())
             );
-        }, done, 'js', false, function(configuration) {
+        }, done, 'js', false, function (configuration) {
             return configuration.hasOwnProperty('lint');
         }, $defaults.js);
     });
