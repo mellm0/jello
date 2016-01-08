@@ -1,7 +1,7 @@
 module.exports = function (gulp, $, $env) {
     var $helpers = require("../lib/helpers")(gulp, $, $env),
         jekyllIsAvailable = function () {
-            return $env.shell.which('jekyll') && $env.shell.test('-f', '_config.yml');
+            return $env.shell.which('jekyll') && $env.shell.test('-f', $env.$defaults.jekyll.config_file);
         },
         args = function (args) {
             if (!args) {
@@ -9,7 +9,7 @@ module.exports = function (gulp, $, $env) {
             }
 
             if ($env.project().hasOwnProperty('jekyll')) {
-                if ($env.project().hasOwnProperty('src')) {
+                if ($env.project().jekyll.hasOwnProperty('src')) {
                     args.push('--source ' + $env.project().jekyll.src);
                 }
 

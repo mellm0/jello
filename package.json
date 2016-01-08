@@ -2,17 +2,18 @@
   "name": "mwm-buildr",
   "version": "0.0.1",
   "description": "Used for milkywaymultimedia.com.au projects - for managing assets, backups and deployment",
-  "private": true,
   "main": "index.js",
+  "private": true,
   "repository": {
     "type": "git",
     "url": "git@bitbucket.org:milkyway-multimedia/mwm-buildr.git"
   },
   "author": {
     "name": "Mellisa Hankins",
-    "email": "mellisa.hankins@me.com"
+    "email": "mellisa.hankins@me.com",
+    "url": "http://mellimade.com.au"
   },
-  "license": "Commercial",
+  "license": "BSD",
   "dependencies": {
     "browser-sync": "~2",
     "del": "~2",

@@ -1,5 +1,5 @@
 module.exports = function (gulp, $, $env) {
-    var $defaults = require("../lib/defaults")(gulp, $, $env),
+    var $defaults = $env.$defaults,
         startPhp = function(options, cb) {
             if(options && (!options.hasOwnProperty('php') || !$env.shell.which('php'))) {
                 return false;

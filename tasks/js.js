@@ -1,5 +1,5 @@
 module.exports = function (gulp, $, $env) {
-    var $defaults = require("../lib/defaults")(gulp, $, $env),
+    var $defaults = $env.$defaults,
         $helpers = require("../lib/helpers")(gulp, $, $env),
         $transform = require("../lib/transformers")(gulp, $, $env);
 
@@ -22,9 +22,7 @@ module.exports = function (gulp, $, $env) {
 
             if (configuration.browserify) {
                 addToStream(
-                    $transform.js(configuration)()
-                        .pipe(gulp.dest(configuration.dest))
-                    //.pipe($env.server.reload({stream: true}))
+                    $transform.browserify(configuration)()
                 );
             }
             else {
@@ -49,6 +47,16 @@ module.exports = function (gulp, $, $env) {
             );
         }, done, 'js', false, function (configuration) {
             return configuration.hasOwnProperty('lint');
+        }, $defaults.js);
+    });
+
+    // Initialise watchify for JS
+    gulp.task('js:watchify', ['start', 'js:clean'], function (done) {
+        return $env.apply_to_config_and_stream(function (configuration, addToStream) {
+            configuration = $helpers.config.add_filename(configuration, 'js');
+            addToStream($transform.watchify(configuration)());
+        }, done, 'js', false, function (configuration) {
+            return configuration.hasOwnProperty('browserify');
         }, $defaults.js);
     });
 };

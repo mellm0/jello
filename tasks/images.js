@@ -1,5 +1,5 @@
 module.exports = function (gulp, $, $env) {
-    var $defaults = require("../lib/defaults")(gulp, $, $env),
+    var $defaults = $env.$defaults,
         $helpers = require("../lib/helpers")(gulp, $, $env),
         $transform = require("../lib/transformers")(gulp, $, $env);
 
