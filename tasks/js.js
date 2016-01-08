@@ -21,9 +21,7 @@ module.exports = function (gulp, $, $env) {
             configuration = $helpers.config.add_filename(configuration, 'js');
 
             if (configuration.browserify) {
-                addToStream(
-                    $transform.browserify(configuration)()
-                );
+                $transform.browserify(configuration, addToStream);
             }
             else {
                 addToStream(
