@@ -79,6 +79,10 @@ module.exports = function (gulp, $, $env) {
                         else if (minorTask.hasOwnProperty('src')) {
                             src = src.concat(minorTask.src);
                         }
+
+                        if(minorTask.hasOwnProperty('watch-additional')) {
+                            src = src.concat(minorTask['watch-additional']);
+                        }
                     });
                 }
                 else {
@@ -97,6 +101,10 @@ module.exports = function (gulp, $, $env) {
                     }
                     else if (configuration[task].hasOwnProperty('src')) {
                         src = src.concat(configuration[task].src);
+                    }
+
+                    if(configuration[task].hasOwnProperty('watch-additional')) {
+                        src = src.concat(configuration[task]['watch-additional']);
                     }
                 }
 
