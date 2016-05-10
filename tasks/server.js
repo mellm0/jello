@@ -29,6 +29,21 @@ module.exports = function (gulp, $, $env) {
             options.open = true;
         }
 
+        if(options.hasOwnProperty('proxy')) {
+            options.proxy = {
+                target: options.proxy,
+                proxyReq: [
+                    function (proxyRequest, message) {
+                        if(!message || !message.hasOwnProperty('headers') || !message.headers.hasOwnProperty('host')) {
+                            return;
+                        }
+
+                        proxyRequest.setHeader('X-BS-Proxy-Host', message.headers.host);
+                    }
+                ]
+            };
+        }
+
         $env.server(options, function () {
             done();
         });
