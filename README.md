@@ -9,6 +9,7 @@ is installed, you can use npm to install gulp: http://gulpjs.com/)
 - [x] Compose LESS and SCSS to css
 - [x] Lint JS and check if they are valid for you
 - [x] Minimise CSS, JS, Images, HTML and SVG
+- [x] Copy files from one directory to another
 - [x] Create SVG sprites to use as icons or other uses
 - [x] Serve jekyll files and configuration, for static sites
 - [x] Execute gulp in sub-directories that include a assets.json file
@@ -32,7 +33,7 @@ Simply install by using:
 ```
 npm install 'gulp' -g
 npm install 'gulp' --save-dev
-npm install 'git+ssh://git@bitbucket.org:milkyway-multimedia/mwm-buildr.git' --save-dev
+npm install 'git+ssh://git@bitbucket.org:milkyway-multimedia/mwm.buildr.git' --save-dev
 ```
 
 Or add it to your **devDependencies** property in your package.json file. *It is also important
@@ -43,7 +44,7 @@ to gulpfile.js, or copy the following code into a gulpfile.js file in your proje
 
 ```
 var gulp = require('gulp');
-require('mwm-buildr')(gulp);
+require('mwm.buildr')(gulp);
 ```
 
 You can add additional tasks to your gulpfile.js, and you also now have access to the standard mwm-buildr tasks (yay!)

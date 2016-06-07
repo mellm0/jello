@@ -14,27 +14,6 @@ module.exports = function (gulp, settings) {
         gulp = require('gulp');
     }
 
-    if (!settings.hasOwnProperty('tasks')) {
-        settings.tasks = [
-            './tasks/watchers',
-            './tasks/deploy',
-            './tasks/utilities',
-            './tasks/server',
-            './tasks/css',
-            './tasks/js',
-            './tasks/images',
-            './tasks/sprites',
-            './tasks/html',
-            './tasks/jekyll',
-            './tasks/copy',
-            './tasks/build',
-            './tasks/install',
-            './tasks/update',
-            './tasks/git',
-            './tasks/targets'
-        ];
-    }
-
     // Some fixes to gulp for handling errors
     // @TODO: To be removed in Gulp 4
     var origSrc = gulp.src;
@@ -61,11 +40,26 @@ module.exports = function (gulp, settings) {
         return stream;
     }
 
-    //$env.start(function () {
-    //    for(var i=0;i<tasks.length;i++) {
-    //        require(tasks[i])(gulp, $, $env);
-    //    }
-    //});
+    if (!settings.hasOwnProperty('tasks')) {
+        settings.tasks = [
+            './tasks/watchers',
+            './tasks/deploy',
+            './tasks/utilities',
+            './tasks/server',
+            './tasks/css',
+            './tasks/js',
+            './tasks/images',
+            './tasks/sprites',
+            './tasks/html',
+            './tasks/jekyll',
+            './tasks/copy',
+            './tasks/build',
+            './tasks/install',
+            './tasks/update',
+            './tasks/git',
+            './tasks/targets'
+        ];
+    }
 
     for (var i = 0; i < settings.tasks.length; i++) {
         require(settings.tasks[i])(gulp, $, $env);
