@@ -7,7 +7,8 @@ module.exports = function (gulp, $, $env) {
                 'build:html':    ['html'],
                 'build:images':  ['images'],
                 'build:sprites': ['sprites'],
-                'build:copy':    ['copy']
+                'build:copy':    ['copy'],
+                'build:jekyll':  ['jekyll']
             },
             build: [
                 'build:css',
@@ -15,9 +16,10 @@ module.exports = function (gulp, $, $env) {
                 'build:html',
                 'build:images',
                 'build:sprites',
-                'build:copy'
+                'build:copy',
+                'build:jekyll'
             ],
-            'build-after': []
+            'build-after': ['build:jekyll']
         },
 
         buildTasksHasBeenReset = false,
