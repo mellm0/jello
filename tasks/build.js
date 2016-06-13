@@ -17,9 +17,7 @@ module.exports = function (gulp, $, $env) {
                 'build:sprites',
                 'build:copy'
             ],
-            'build-after': [
-                'jekyll'
-            ]
+            'build-after': []
         },
 
         buildTasksHasBeenReset = false,
@@ -32,7 +30,7 @@ module.exports = function (gulp, $, $env) {
                 done();
             };
 
-            if ($env.get('disable_sync')) {
+            if ($env.get('disable_sync') || !tasks['build-after'].length) {
                 callback();
             }
             else {
@@ -50,7 +48,7 @@ module.exports = function (gulp, $, $env) {
             }
         },
 
-    // Build all assets
+        // Build all assets
         startBuildTasks = function() {
             var buildTasks = tasks.build;
 
@@ -60,12 +58,19 @@ module.exports = function (gulp, $, $env) {
             gulp.task('build', function(done) {
                 $env.set('disable_sync', true);
 
-                $helpers.sequence.use(gulp)(buildTasks, tasks['build-after'], function() {
+                var cb = function() {
                     $env.set('disable_sync', false);
                     $env.server.reload();
                     $env.trigger('built');
                     done();
-                });
+                };
+
+                if(tasks['build-after'].length) {
+                    $helpers.sequence.use(gulp)(buildTasks, tasks['build-after'], cb);
+                }
+                else {
+                    $helpers.sequence.use(gulp)(buildTasks, cb);
+                }
             });
 
             return true;
@@ -82,6 +87,10 @@ module.exports = function (gulp, $, $env) {
 
             gulp.stop(false, true);
         };
+
+    if($env.get('after_build_tasks')) {
+        tasks['build-after'] = $env.get('after_build_tasks');
+    }
 
     $env.on('start', function(env, configs) {
         var task;
