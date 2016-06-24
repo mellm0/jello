@@ -22,6 +22,7 @@ module.exports = function (gulp, $, $env) {
 
     gulp.task('watch', ['start', 'server', 'build'], function () {
         $env.server.reload();
+        $env.set('watching', true);
 
         var watchers = {},
             configurations = $env.start(),
@@ -148,8 +149,11 @@ module.exports = function (gulp, $, $env) {
     // Set up watches for some JSON files
     for (var file in watchFiles) {
         if (watchFiles.hasOwnProperty(file)) {
-            gulp.task('watch:' + file, watchFiles[file], function (done) {
+            gulp.task('watch:' + file, function (done) {
+                $env.set('watching', true);
+
                 $helpers.sequence.use(gulp)(
+                    watchFiles[file],
                     'build',
                     function () {
                         $env.server.reload();

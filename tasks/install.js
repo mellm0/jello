@@ -57,7 +57,7 @@ module.exports = function (gulp, $, $env) {
 
     // Install node packages
     gulp.task('install:npm', ['start'], function (done) {
-        if ($env.shell.which('npm')) {
+        if ($env.shell.which('npm') && !$env.get('watching')) {
             $env.execute_on_modules_then_project(getOptionsForExecution(function(folder) {
                 var command = $.util.env.dev ? 'npm install' : 'npm install --production',
                     commands = [];
