@@ -35,7 +35,19 @@ module.exports = function (gulp, $, $env) {
     gulp.task('install:bower', ['start'], function (done) {
         if ($env.shell.which('bower')) {
             $env.execute_on_modules_then_project(getOptionsForExecution(function(folder) {
-                return $helpers.get_sub_shelled_command(['bower install'], folder);
+                var command = $.util.env.dev ? 'bower install' : 'bower install --production',
+                    commands = [];
+
+                if(!folder || !$.util.env.deleteModuleDependencies) {
+                    commands.push(command);
+                }
+
+                if(folder) {
+                    var prefix = $helpers.get_relative_location_of_module(folder);
+                    commands.push(command + " --config.directory='" + prefix + "'");
+                }
+
+                return $helpers.get_sub_shelled_command(commands, folder);
             }, 'bower.json', 'bower packages'), done);
         }
         else {
@@ -47,14 +59,18 @@ module.exports = function (gulp, $, $env) {
     gulp.task('install:npm', ['start'], function (done) {
         if ($env.shell.which('npm')) {
             $env.execute_on_modules_then_project(getOptionsForExecution(function(folder) {
-                var commands = ['npm install'];
+                var command = $.util.env.dev ? 'npm install' : 'npm install --production',
+                    commands = [];
 
-                if(!folder && !$.util.env.installDevModules) {
-                    commands = [
-                        'npm install --production',
-                        "if [ -d 'node_modules' ]; then rsync -av node_modules/ ../node_modules/; fi",
-                        "if [ -d 'node_modules' ]; then rm -rf node_modules; fi"
-                    ];
+                commands.push(command);
+
+                if(folder) {
+                    var prefix = $helpers.get_relative_location_of_module(folder);
+                    commands.push("if [ -d 'node_modules' ]; then rsync -av node_modules/ " + prefix + "/node_modules/; fi");
+
+                    if($.util.env.deleteModuleDependencies) {
+                        commands.push("if [ -d 'node_modules' ]; then rm -rf node_modules; fi");
+                    }
                 }
 
                 return $helpers.get_sub_shelled_command(commands, folder);

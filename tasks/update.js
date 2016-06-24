@@ -35,7 +35,19 @@ module.exports = function (gulp, $, $env) {
     gulp.task('update:bower', function (done) {
         if ($env.shell.which('bower')) {
             $env.execute_on_modules_then_project(getOptionsForExecution(function(folder) {
-                return $helpers.get_sub_shelled_command(['bower update'], folder);
+                var command = $.util.env.dev ? 'bower update' : 'bower update --production',
+                    commands = [];
+
+                if(!folder || !$.util.env.deleteModuleDependencies) {
+                    commands.push(command);
+                }
+
+                if(folder) {
+                    var prefix = $helpers.get_relative_location_of_module(folder);
+                    commands.push(command + " --config.directory='" + prefix + "'");
+                }
+
+                return $helpers.get_sub_shelled_command(commands, folder);
             }, 'bower.json', 'bower packages'), done);
         }
         else {
@@ -45,12 +57,24 @@ module.exports = function (gulp, $, $env) {
 
     // Update node packages
     gulp.task('update:npm', function (done) {
-        if ($env.shell.which('npm') && $env.shell.test('-f', 'package.json')) {
-            $.util.log('Updating node packages');
-            $env.shell.exec('npm update', function () {
-                $helpers.notify('Updated node packages');
-                done();
-            });
+        if ($env.shell.which('npm')) {
+            $env.execute_on_modules_then_project(getOptionsForExecution(function(folder) {
+                var command = $.util.env.dev ? 'npm update' : 'npm update --production',
+                    commands = [];
+
+                commands.push(command);
+
+                if(folder) {
+                    var prefix = $helpers.get_relative_location_of_module(folder);
+                    commands.push("if [ -d 'node_modules' ]; then rsync -av node_modules/ " + prefix + "/node_modules/; fi");
+
+                    if($.util.env.deleteModuleDependencies) {
+                        commands.push("if [ -d 'node_modules' ]; then rm -rf node_modules; fi");
+                    }
+                }
+
+                return $helpers.get_sub_shelled_command(commands, folder);
+            }, 'package.json', 'node packages'), done);
         }
         else {
             done();
