@@ -259,28 +259,36 @@ module.exports = function (gulp, $, $env) {
         }
 
         if (isAvailable()) {
-            var sudoPassword = $.util.env.pass ? $.util.env.pass : false;
+            var sudoPassword = $.util.env.pass ? $.util.env.pass : false,
+                doneCalled = false;
 
             applyToOneOrAllTargets(function (configuration, incrementUpdates, incrementFinished, ifDone) {
                 incrementUpdates();
 
                 $remote.execute_src_and_dest(
-                    'dest-commands-'+command,
-                    'src-commands-'+command,
-                    null,
-                    null,
-                    configuration,
-                    function (dest, src, options, commandsDone) {
-                        if(commandsDone && commandsDone.length)
-                            $helpers.notify(commandsDone.join(' and ') + ' has been executed');
-                        else
-                            $helpers.notify('dest-commands-'+command+' or src-commands-'+command+' unavailable in this configuration');
-                        incrementFinished();
-                        ifDone();
-                    },
-                    {sudoPassword: sudoPassword}
+                  'dest-commands-'+command,
+                  'src-commands-'+command,
+                  null,
+                  null,
+                  configuration,
+                  function (dest, src, options, commandsDone) {
+                      if(commandsDone && commandsDone.length)
+                          $helpers.notify(commandsDone.join(' and ') + ' has been executed');
+                      else
+                          $helpers.notify('dest-commands-'+command+' or src-commands-'+command+' unavailable in this configuration');
+                      incrementFinished();
+                      ifDone();
+                  },
+                  {sudoPassword: sudoPassword}
                 );
-            }, done, null, 'on');
+            }, function() {
+                if(doneCalled) {
+                    return;
+                }
+
+                done();
+                doneCalled = true;
+            }, null, 'on');
         }
         else {
             done();
