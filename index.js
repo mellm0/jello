@@ -57,7 +57,8 @@ module.exports = function (gulp, settings) {
             './tasks/install',
             './tasks/update',
             './tasks/git',
-            './tasks/targets'
+            './tasks/targets',
+            './tasks/clean'
         ];
     }
 
