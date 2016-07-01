@@ -19,7 +19,7 @@ module.exports = function (gulp, $, $env) {
                 'build:copy',
                 'build:jekyll'
             ],
-            'build-after': ['build:jekyll']
+            'build-after': ['jekyll']
         },
 
         buildTasksHasBeenReset = false,
