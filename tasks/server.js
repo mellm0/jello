@@ -73,6 +73,7 @@ module.exports = function (gulp, $, $env) {
         }
 
         $env.server(options, function () {
+            $env.trigger('server:start', [this]);
             done();
         });
     });
