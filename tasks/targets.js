@@ -130,7 +130,10 @@ module.exports = function (gulp, $, $env) {
 
                 var options = $remote.reverse_src_and_dest(configuration);
 
-                options.dest = $helpers.rtrim($env.shell.pwd(), '/');
+                if(!options.hasOwnProperty('dest')) {
+                    options.dest = $helpers.rtrim($env.shell.pwd(), '/');
+                }
+
                 delete options.host;
                 delete options.username;
 
